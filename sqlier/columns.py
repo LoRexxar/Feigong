@@ -10,15 +10,22 @@ __author__ = "LoRexxar"
 class SqliColumns(SqliTables):
     def __init__(self):
         SqliTables.__init__(self)
-        self.columns_name = []
+        self.columns_name = [[]]
         if self.tables_name == 0:
             SqliTables.get_tables(self)
 
     # 获取列名
     def get_columns(self):
 
+        # 设定一个循环的标志位
+        i = 0
+
         # 每个tables_name需要跑一次columns_name
         for tables_name in self.tables_name:
+
+            # 若不是0，那么就追加一个list
+            if i != 0:
+                self.columns_name.append([])
 
             # 开始跑columns_name
             logger.info("Start sqli databases %s tables %s..." % self.database, tables_name)
@@ -52,7 +59,7 @@ class SqliColumns(SqliTables):
                         columns_name = UnpackFunction(r)
                         logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
                         # 把columns_name插入列表
-                        self.columns_name.append(columns_name)
+                        self.columns_name[i].append(columns_name)
                         print "[*] columns_name: %s" % columns_name
 
                 elif self.sqlimethod == "build":
@@ -93,7 +100,7 @@ class SqliColumns(SqliTables):
 
                         logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
                         # 把columns_name插入列表
-                        self.columns_name.append(columns_name)
+                        self.columns_name[i].append(columns_name)
                         print "[*] columns_name:" + columns_name
 
                 elif self.sqlimethod == "time":
@@ -137,7 +144,7 @@ class SqliColumns(SqliTables):
 
                         logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
                         # 把columns_name插入列表
-                        self.columns_name.append(columns_name)
+                        self.columns_name[i].append(columns_name)
                         print "[*] columns_name:" + columns_name
 
             # 然后是post
@@ -175,7 +182,7 @@ class SqliColumns(SqliTables):
                         columns_name = UnpackFunction(r)
                         logger.info("Columns name sqli success...The tables_name_len is %d..." % tables_name)
                         # 把columns_name插入列表
-                        self.columns_name.append(columns_name)
+                        self.columns_name[i].append(columns_name)
                         print "[*] columns_name: %s" % columns_name
 
                 elif self.sqlimethod == "build":
@@ -218,7 +225,7 @@ class SqliColumns(SqliTables):
 
                         logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
                         # 把columns_name插入列表
-                        self.columns_name.append(columns_name)
+                        self.columns_name[i].append(columns_name)
                         print "[*] columns_name:" + columns_name
 
                 elif self.sqlimethod == "time":
@@ -264,5 +271,9 @@ class SqliColumns(SqliTables):
 
                         logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
                         # 把columns_name插入列表
-                        self.columns_name.append(columns_name)
+                        self.columns_name[i].append(columns_name)
                         print "[*] columns_name:" + columns_name
+
+            # 标志位自加1
+            i+=1
+            logger.info("Sqli tables %s is %dst..." % tables_name, i)

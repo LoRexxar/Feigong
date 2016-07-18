@@ -3,26 +3,27 @@
 import hashlib
 from lib.log import logger
 from data import DataProcess
+from config import BaseConfig
 
 __author__ = "LoRexxar"
 
 
-class ExpandFunction:
+class ExpandFunction(BaseConfig):
     """
     拓展函数，自定义处理复杂情况
     """
 
     # 从页面中获取验证码
     def __init__(self):
-        pass
+        BaseConfig.__init__(self)
 
-    def get_code(url):
-        r = s.get(url)
+    def get_code(self):
+        r = self.s.get(self.url)
         code = r.text.find('==')
         return r.text[code + 3:code + 7]
 
     # 跑验证码
-    def crack_code(code):
+    def crack_code(self, code):
         sstr = 10000
 
         while 1:

