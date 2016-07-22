@@ -32,15 +32,6 @@ class BaseConfig:
         self.url = 'http://l.0x48.pw/nweb/sqli1/index.php'
         self.s = requests.Session()
 
-        # 注数据的条数 默认为
-        self.content_count = 10
-
-        '''
-        database可以自定义，默认为空，若为空会调用get_database(),这里是一个列表，必须按照列表格式
-        self.databases_name = ['test', 'test2']
-        '''
-        self.databases_name = []
-
         # 传参方式 0为GET 1为POST
         SqliRequest = (
             "GET",
@@ -98,3 +89,31 @@ class BaseConfig:
             "version": 1,
             "user": 1
         }
+        '''
+        正式注入模式的选择，test模式开启时，无论正式注入模式是否开启都无效，默认开启
+
+        all为全部注入，将自动从database注入直到数据前10条
+        content为注入数据，可以预设columns、tables和database
+        columns为注入列名，可以预设tables和database
+        tables为注入表名，可以预设database
+        database为注入表名
+        统一规则为如果不预设，则自动调用上一层的类获取数据
+        '''
+        self.wsqli = True
+
+        self.sqlilocation = {
+            "all": 0,
+            "content": 0,
+            "columns": 0,
+            "tables": 0,
+            "database": 1
+        }
+
+        # 注数据的条数 默认为
+        self.content_count = 10
+
+        '''
+        database可以自定义，默认为空，若为空会调用get_database(),这里是一个列表，必须按照列表格式
+        self.databases_name = ['test', 'test2']（当然，如果database_name错误...则不会注到数据）
+        '''
+        self.databases_name = []
