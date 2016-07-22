@@ -2,36 +2,35 @@
 # -*- coding:utf-8 -*-
 import requests
 import time
-from bs4 import BeautifulSoup
+from urllib import quote
 from lib.log import logger
-from config import conf
+from config import BaseConfig
 
 __author__ = "LoRexxar"
 
 
-class DataProcess:
+class DataProcess(BaseConfig):
     # 获取返回数据
     def __init__(self):
-        self.url = conf['url']
-        # self.sqlimethod = conf['SqliMethod']
-        # self.payload = Queue.Queue
+        BaseConfig.__init__(self)
 
     def GetLen(self, payload):
-        data = payload
-        r = conf['s'].get(self.url+"?"+data)
+        data = quote(payload)
+        r = self.s.get(self.url+"?"+data)
         lens = len(r.text.encode('utf-8'))
         return lens
 
     def GetData(self, payload):
         data = payload
-        r = conf['s'].get(self.url + "?" + data)
+        r = self.s.get(self.url + "?" + data)
         return r.text.encode('utf-8')
 
     def GetBuildData(self, payload, llen):
         data = payload
-        r = conf['s'].get(self.url+"?"+data)
+        r = self.s.get(self.url + "?" + data)
         lens = len(r.text.encode('utf-8'))
         # print r.text.encode('utf-8')
+        # print payload
         if lens == llen:
             return 1
         else:
@@ -40,7 +39,7 @@ class DataProcess:
     def GetTimeData(self, payload, dtime):
         data = payload
         ptime = time.time()
-        r = conf['s'].get(self.url + "?" + data)
+        r = self.s.get(self.url + "?" + data)
         rr = r.text.encode('utf-8')
         ntime = time.time()
         if ntime-ptime > dtime:
@@ -50,17 +49,17 @@ class DataProcess:
 
     def PostLen(self, payload):
         data = payload
-        r = conf['s'].post(self.url, data=data)
+        r = self.s.post(self.url, data=data)
         return len(r.text.encode('utf-8'))
 
     def PostData(self, payload):
         data = payload
-        r = conf['s'].post(self.url, data=data)
+        r = self.s.post(self.url, data=data)
         return r.text.encode('utf-8')
 
     def PostBuildData(self, payload, llen):
         data = payload
-        r = conf['s'].post(self.url, data=data)
+        r = self.s.post(self.url, data=data)
         lens = len(r.text.encode('utf-8'))
         # print r.text.encode('utf-8')
         if lens == llen:
@@ -71,7 +70,7 @@ class DataProcess:
     def PostTimeData(self, payload, dtime):
         data = payload
         ptime = time.time()
-        r = conf['s'].post(self.url, data=data)
+        r = self.s.post(self.url, data=data)
         rr = r.text.encode('utf-8')
         ntime = time.time()
         if ntime - ptime > dtime:

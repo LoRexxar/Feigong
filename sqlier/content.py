@@ -15,8 +15,8 @@ class SqliContent(SqliColumns):
 
     # 多线程判断跑数据
     def run_content(self):
-        for i in self.content_count:
-
+        # for i in self.content_count:
+        pass
 
     # 获取内容
     def get_content(self, database_name, table_name, column_name, limits, content=None):

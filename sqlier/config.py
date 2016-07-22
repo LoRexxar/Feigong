@@ -7,17 +7,19 @@ __author__ = "LoRexxar"
 
 
 def UnpackFunction(r):
-    index = r.find('<td>')
-    index2 = r[index + 4:].find('</td>')
-    return r[index + 4:][:index2]
+    # index = r.find('<td>')
+    # index2 = r[index + 4:].find('</td>')
+    soup = BeautifulSoup(r, "lxml")
+    r = soup.find_all("td")[1].string
+    return r
 
 
 class BaseConfig:
     def __init__(self):
-        self.version = "V0.6.1"
+        self.version = "V0.7.2"
 
         # 目标url
-        self.url = 'http://xxxxxx/user/logCheck.php'
+        self.url = 'http://l.0x48.pw/nweb/sqli1/index.php'
         self.s = requests.Session()
 
         # 注数据的条数 默认为
@@ -34,7 +36,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.SqliRequest = SqliRequest[0]
+        self.sqlirequest = SqliRequest[1]
 
         # 当传参方式为GET
         # payload传入为键值对方式
@@ -52,7 +54,7 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.SqliMethod = SqliMethod[0]
+        self.sqlimethod = SqliMethod[2]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4
         # 需要注意的是，这里输入为r.text.encode('utf-8'), return必须为查询返回值，不能多标签符号等

