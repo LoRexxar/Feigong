@@ -18,9 +18,20 @@ def main():
     log(logging.INFO)
     logger.info('start sqli...')
     s = SqliContent()
-    s.get_now_database()
+    if s.wtest:
+        if s.testmethod['test']:
+            s.test(output=1)
+        if s.testmethod['database']:
+            s.get_now_database()
+        if s.testmethod['version']:
+            s.get_version()
+        if s.testmethod['user']:
+            s.get_user()
+    else:
+        pass
+
     # SqliTables.get_tables()
-    # SqliColums.get_columns()
+    # SqliColumns.get_columns()
     # SqliContent.get_flag()
     # print ExpandFunction.crack_code('593e')
 

