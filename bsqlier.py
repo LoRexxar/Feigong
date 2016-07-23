@@ -27,8 +27,23 @@ def main():
             s.get_version()
         if s.testmethod['user']:
             s.get_user()
+    elif s.wsqli:
+        if s.sqlilocation['all']:
+            s.run_content()
+        elif s.sqlilocation['content']:
+            s.run_content()
+        elif s.sqlilocation['columns']:
+            s.get_columns()
+        elif s.sqlilocation['tables']:
+            s.get_tables()
+        elif s.sqlilocation['database']:
+            s.get_database()
+        else:
+            logger.error("Sqlilocation error, Not choose any injection pattern")
+            exit(0)
     else:
-        pass
+        logger.error("Did not select any mode")
+        exit(0)
 
     # SqliTables.get_tables()
     # SqliColumns.get_columns()

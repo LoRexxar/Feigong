@@ -12,7 +12,9 @@ __author__ = "LoRexxar"
 class SqliDatabases(SqliTest):
     def __init__(self):
         SqliTest.__init__(self)
-        SqliTest.test(self, output=0)
+        if self.len == 0:
+            SqliTest.test(self, output=0)
+
         self.databases_name = []
 
     def get_database(self):

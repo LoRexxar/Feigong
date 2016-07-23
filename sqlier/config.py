@@ -13,6 +13,12 @@ __author__ = "LoRexxar"
             index = r.find('<td>')
             index2 = r[index + 4:].find('</td>')
             return r[index + 4:][:index2]
+
+        bs4
+        def UnpackFunction(r):
+            soup = BeautifulSoup(r, "lxml")
+            r = soup.find_all("td")[1].string
+            return r
 '''
 
 
@@ -26,6 +32,9 @@ def UnpackFunction(r):
 
 class BaseConfig:
     def __init__(self):
+        """
+        基类初始化，整个注入工具的核心配置
+        """
         self.version = "V0.7.2"
 
         # 目标url
@@ -38,6 +47,7 @@ class BaseConfig:
             "POST"
         )
         self.sqlirequest = SqliRequest[0]
+
         '''
         当传参方式为GET
         payload传入为键值对方式
@@ -109,7 +119,7 @@ class BaseConfig:
             "database": 1
         }
 
-        # 注数据的条数 默认为
+        # 注数据的条数 默认为10
         self.content_count = 10
 
         '''
