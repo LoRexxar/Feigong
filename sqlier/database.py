@@ -17,11 +17,7 @@ class SqliDatabases(SqliTest):
         if self.len == 0:
             SqliTest.test(self, output=0)
 
-        self.databases_name = []
-
     def get_database(self):
-
-        databases_name = ""
 
         if self.sqlirequest == "GET":
             logger.info("The sqlirequest is %s, start sqli databases..." % self.sqlirequest)

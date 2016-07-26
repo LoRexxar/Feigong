@@ -47,7 +47,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[1]
+        self.sqlirequest = SqliRequest[0]
 
         '''
         当传参方式为GET
@@ -69,7 +69,7 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[2]
+        self.sqlimethod = SqliMethod[0]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
@@ -116,8 +116,8 @@ class BaseConfig:
             "all": 0,
             "content": 0,
             "columns": 0,
-            "tables": 0,
-            "database": 1
+            "tables": 1,
+            "database": 0
         }
 
         # 注数据的条数 默认为10
@@ -127,4 +127,10 @@ class BaseConfig:
         database可以自定义，默认为空，若为空会调用get_database(),这里是一个列表，必须按照列表格式
         self.databases_name = ['test', 'test2']（当然，如果database_name错误...则不会注到数据）
         '''
-        self.databases_name = []
+        self.databases_name = ['hctfsqli1', 'test']
+
+        '''
+        然后是table name，tables_name的格式为字典+元组，如果指定tables_name，则必须指定databases_name
+        self.tables_name = {'hctfsqli1': ('test1', 'test2'), 'test',('test1', 'test2')}(如果有写错某些值，则会注不到数据)
+        '''
+        self.tables_name = {}
