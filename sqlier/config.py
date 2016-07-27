@@ -2,23 +2,22 @@
 # -*- coding:utf-8 -*-
 import requests
 from bs4 import BeautifulSoup
-from lib.log import logger
 __author__ = "LoRexxar"
 
 
 '''
 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4
-        需要注意的是，这里输入为r.text.encode('utf-8'), return必须为查询返回值，不能多标签符号等
-        def UnpackFunction(self, r):
-            index = r.find('<td>')
-            index2 = r[index + 4:].find('</td>')
-            return r[index + 4:][:index2]
+需要注意的是，这里输入为r.text.encode('utf-8'), return必须为查询返回值，不能多标签符号等
+def UnpackFunction(self, r):
+    index = r.find('<td>')
+    index2 = r[index + 4:].find('</td>')
+    return r[index + 4:][:index2]
 
-        bs4
-        def UnpackFunction(r):
-            soup = BeautifulSoup(r, "lxml")
-            r = soup.find_all("td")[1].string
-            return r
+bs4
+def UnpackFunction(r):
+    soup = BeautifulSoup(r, "lxml")
+    r = soup.find_all("td")[1].string
+    return r
 '''
 
 
@@ -26,8 +25,12 @@ def UnpackFunction(r):
     # index = r.find('<td>')
     # index2 = r[index + 4:].find('</td>')
     soup = BeautifulSoup(r, "lxml")
-    # r = soup.prettify()
-    r = soup.find_all("td")[1].string
+    r = soup.prettify()
+    try:
+        r = soup.find_all("td")[1].string
+    except IndexError:
+        print r
+        return 5
     return r
 
 
@@ -115,9 +118,9 @@ class BaseConfig:
         self.sqlilocation = {
             "all": 0,
             "content": 0,
-            "columns": 0,
+            "columns": 1,
             "tables": 1,
-            "database": 0
+            "database": 1
         }
 
         # 注数据的条数 默认为10
@@ -127,10 +130,19 @@ class BaseConfig:
         database可以自定义，默认为空，若为空会调用get_database(),这里是一个列表，必须按照列表格式
         self.databases_name = ['test', 'test2']（当然，如果database_name错误...则不会注到数据）
         '''
-        self.databases_name = ['hctfsqli1', 'test']
+        # self.databases_name = ['hctfsqli1', 'test']
+        self.databases_name = []
 
         '''
-        然后是table name，tables_name的格式为字典+元组，如果指定tables_name，则必须指定databases_name
+        然后是table name，tables_name的格式为字典+元组
         self.tables_name = {'hctfsqli1': ('test1', 'test2'), 'test',('test1', 'test2')}(如果有写错某些值，则会注不到数据)
         '''
-        self.tables_name = {}
+        self.tables_name = {'test': ('test',), 'hctfsqli1': ('hhhhctf', 'test', 'users')}
+        # self.tables_name = {}
+
+        '''
+        然后是self.columns_name，columns_name的格式为字典套字典+元组
+        self.columns_name = {'test': {'test': ('test', 'test1', 'test2')}, 'test2': {'test': ('test', 'test1', 'test2')}}
+        (同样，如果有写错的值，则会注入不到数据)
+        '''
+        self.columns_name = {}
