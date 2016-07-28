@@ -16,7 +16,7 @@ class DummyTqdmFile(object):
     def write(self, x):
         # Avoid print() second call (useless \n)
         if len(x.rstrip()) > 0:
-            tqdm.write(x, file=self.file)
+            logger.info(x, file=self.file)
 
 
 @contextlib.contextmanager
@@ -32,7 +32,7 @@ def stdout_redirect_to_tqdm():
     finally:
         sys.stdout = save_stdout
 
-# # Redirect stdout to tqdm.write() (don't forget the `as save_stdout`)
+# # Redirect stdout to logger.info() (don't forget the `as save_stdout`)
 with stdout_redirect_to_tqdm() as save_stdout:
     # tqdm call need to specify sys.stdout, not sys.stderr (default)
     # and dynamic_ncols=True to autodetect console width

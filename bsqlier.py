@@ -15,9 +15,9 @@ __author__ = "LoRexxar"
 
 
 def main():
-    # log(logging.INFO)
-    log(logging.ERROR)
-    logger.info('start sqli...')
+    log(logging.DEBUG)
+    # log(logging.ERROR)
+    logger.debug('start sqli...')
     s = SqliContent()
     if s.wtest:
         if s.testmethod['test']:
