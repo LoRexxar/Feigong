@@ -15,8 +15,8 @@ __author__ = "LoRexxar"
 
 
 def main():
-    log(logging.DEBUG)
-    # log(logging.ERROR)
+    # log(logging.DEBUG)
+    log(logging.INFO)
     logger.debug('start sqli...')
     s = SqliContent()
     if s.wtest:
@@ -29,9 +29,7 @@ def main():
         if s.testmethod['user']:
             s.get_user()
     elif s.wsqli:
-        if s.sqlilocation['all']:
-            s.run_content()
-        elif s.sqlilocation['content']:
+        if s.sqlilocation['content']:
             s.run_content()
         elif s.sqlilocation['columns']:
             s.get_columns()

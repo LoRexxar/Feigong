@@ -4,7 +4,6 @@ from config import UnpackFunction
 from lib.log import logger
 from tables import SqliTables
 from tqdm import trange
-from tqdm import tqdm
 
 __author__ = "LoRexxar"
 
@@ -327,5 +326,17 @@ class SqliColumns(SqliTables):
 
                 # 把注入得到的columns_name列表转为元组
                 self.columns_name[database_name][table_name] = tuple(columns_name)
+        logger.info("Sqli result:")
+        # 输出所有的列名
+        for database_name in self.columns_name:
+            tables_name = ""
+            for table_name in self.columns_name[database_name]:
+                tables_name += table_name
+                tables_name += ','
+                columns_name = ""
+                for column_name in self.columns_name[database_name][table_name]:
+                    columns_name += column_name
+                    columns_name += ','
 
-        logger.info("[*] columns_name list: ", self.columns_name)
+                logger.info("Table %s has columns %s", table_name, columns_name)
+            logger.info("Database %s has tables %s", database_name, tables_name)

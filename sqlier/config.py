@@ -30,7 +30,6 @@ def UnpackFunction(r):
     try:
         r = soup.find_all("td")[1].string
     except IndexError:
-        print r
         logger.error("UnpackFunction error...")
         exit(0)
     return r
@@ -44,7 +43,7 @@ class BaseConfig:
         self.version = "V0.8.0"
 
         # 目标url
-        self.url = 'http://l.0x48.pw/nweb/sqli1/test.php'
+        self.url = 'http://demo.lorexxar.pw/get.php'
         self.s = requests.Session()
 
         # 传参方式 0为GET 1为POST
@@ -52,7 +51,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[1]
+        self.sqlirequest = SqliRequest[0]
 
         '''
         当传参方式为GET
@@ -74,7 +73,7 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[2]
+        self.sqlimethod = SqliMethod[1]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
@@ -118,15 +117,11 @@ class BaseConfig:
         self.wsqli = True
 
         self.sqlilocation = {
-            "all": 0,
-            "content": 0,
+            "content": 1,
             "columns": 1,
             "tables": 1,
             "database": 1
         }
-
-        # 注数据的条数 默认为10
-        self.content_count = 10
 
         '''
         database可以自定义，默认为空，若为空会调用get_database(),这里是一个列表，必须按照列表格式
@@ -147,4 +142,11 @@ class BaseConfig:
         self.columns_name = {'test': {'test': ('test', 'test1', 'test2')}, 'test2': {'test': ('test', 'test1', 'test2')}}
         (同样，如果有写错的值，则会注入不到数据)
         '''
-        self.columns_name = {}
+        self.columns_name = {'test': {'test': ('test',)}, 'hctfsqli1': {'test': ('test1', 'testtest', 'flag1'), 'users': ('id', 'username'), 'hhhhctf': ('flag',)}}
+        # self.columns_name = {}
+
+        '''
+        当选择注入content时，你需要指定输入数据的上限，默认为10
+        '''
+        self.content_count = 10
+
