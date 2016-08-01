@@ -3,6 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 from lib.log import logger
+from urllib import quote
 __author__ = "LoRexxar"
 
 
@@ -150,3 +151,19 @@ class BaseConfig:
         '''
         self.content_count = 10
 
+        '''
+        从这里开始，要进入对于payload的配置了，首先需要对注入语句进行配置，然后注入语句通过自定义的替换表，之后构造注入语句为请求
+        payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
+
+        '''
+        self.payload = "padding' select 1,'BSqlier' limit 0,1#"
+
+        if self.sqlirequest == 'GET':
+            self.payload = quote(self.payload)
+
+        '''
+        配置请求,把请求中payload的位置设置为BSqlier（如果拼错了就会全部无效...）
+        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
+        self.requesetformat = {"user": "BSqlier", "password": "a"}
+        '''
+        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
