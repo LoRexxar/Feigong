@@ -36,5 +36,15 @@ class DealPayload:
             logger.error("self.Sqlimethod can not be identified")
             exit(0)
 
-    def construct_payload(self, select = None, source = None, conditions = None, limit = 0):
-        
+    def construct_normal_payload(self, select=None, source = None, conditions = None, limit = 0):
+        payload = self.payload
+
+        # select为select的部分，替换自定义的BSqlier
+        if select is not None:
+            payload = self.payload.replace('\'BSqlier\'', select)
+
+        # source为from后面的部分，from的位置稳定在select后面，所以可以通过
+
+        return self.construct_request(payload)
+
+
