@@ -16,18 +16,18 @@ class DataProcess(BaseConfig):
 
     def GetLen(self, payload):
         data = quote(payload)
-        r = self.s.get(self.url+"?"+data)
+        r = self.s.get(self.url + "?" + data, headers=self.headers)
         lens = len(r.text.encode('utf-8'))
         return lens
 
     def GetData(self, payload):
         data = payload
-        r = self.s.get(self.url + "?" + data)
+        r = self.s.get(self.url + "?" + data, headers=self.headers)
         return r.text.encode('utf-8')
 
     def GetBuildData(self, payload, llen):
         data = payload
-        r = self.s.get(self.url + "?" + data)
+        r = self.s.get(self.url + "?" + data, headers=self.headers)
         lens = len(r.text.encode('utf-8'))
         # print r.text.encode('utf-8')
         # print payload
@@ -39,7 +39,7 @@ class DataProcess(BaseConfig):
     def GetTimeData(self, payload, dtime):
         data = payload
         ptime = time.time()
-        r = self.s.get(self.url + "?" + data)
+        r = self.s.get(self.url + "?" + data, headers=self.headers)
         rr = r.text.encode('utf-8')
         ntime = time.time()
         if ntime-ptime > dtime:
@@ -49,7 +49,7 @@ class DataProcess(BaseConfig):
 
     def PostLen(self, payload):
         data = payload
-        r = self.s.post(self.url, data=data)
+        r = self.s.post(self.url, data=data, headers=self.headers)
         return len(r.text.encode('utf-8'))
 
     def PostData(self, payload):
@@ -59,7 +59,7 @@ class DataProcess(BaseConfig):
 
     def PostBuildData(self, payload, llen):
         data = payload
-        r = self.s.post(self.url, data=data)
+        r = self.s.post(self.url, data=data, headers=self.headers)
         lens = len(r.text.encode('utf-8'))
         # print r.text.encode('utf-8')
         if lens == llen:
@@ -70,7 +70,7 @@ class DataProcess(BaseConfig):
     def PostTimeData(self, payload, dtime):
         data = payload
         ptime = time.time()
-        r = self.s.post(self.url, data=data)
+        r = self.s.post(self.url, data=data, headers=self.headers)
         rr = r.text.encode('utf-8')
         ntime = time.time()
         if ntime - ptime > dtime:

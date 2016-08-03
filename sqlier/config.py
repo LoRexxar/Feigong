@@ -47,6 +47,11 @@ class BaseConfig:
         self.url = 'http://demo.lorexxar.pw/get.php'
         self.s = requests.Session()
 
+        # 请求头参数
+        # cookies = {"username":data,"path":"/admin/","domain":"451bf8ea3268360ee.jie.sangebaimao.com"}
+        # self.headers = {"Cookie": "username=" + data + "; captcha=od8lgg6f7i71q16j9rd7p7j9a2; username=" + data}
+        self.headers = {}
+
         # 传参方式 0为GET 1为POST
         SqliRequest = (
             "GET",
