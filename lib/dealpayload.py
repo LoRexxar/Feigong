@@ -3,6 +3,7 @@
 
 from urllib import quote
 from lib.log import logger
+import copy
 
 __author__ = "LoRexxar"
 
@@ -28,10 +29,12 @@ class DealPayload:
             payload = quote(payload)
             return self.requestformat.replace('BSqlier', payload)
         elif self.sqlirequest == "POST":
-            for key in self.requestformat:
-                if self.requestformat[key] == "BSqlier":
-                    self.requestformat[key] = payload
-            return self.requestformat
+            # 这里是list，必须深拷贝
+            request = copy.deepcopy(self.requestformat)
+            for key in request:
+                if request[key] == 'BSqlier':
+                    request[key] = payload
+            return request
         else:
             logger.error("self.Sqlimethod can not be identified")
             exit(0)
@@ -55,13 +58,13 @@ class DealPayload:
             payload.append(source)
 
         # conditions为where条件，紧接着追加在from后面
-        if source is not None:
+        if conditions is not None:
             payload.append('where')
             payload.append(conditions)
 
         # 最后跟上limit,加上last_object
         payload.append('limit')
-        payload.append(repr(limit) + '1')
+        payload.append(repr(limit) + ',1')
         payload.append(last_object)
 
         # 转list为str

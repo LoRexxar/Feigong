@@ -102,13 +102,13 @@ class BaseConfig:
 
         而testmethod则是选择使用那种测试，互相兼容可以同时跑
         '''
-        self.wtest = True
+        self.wtest = False
 
         self.testmethod = {
             "test": 0,
             "database": 1,
-            "version": 0,
-            "user": 0
+            "version": 1,
+            "user": 1
         }
         '''
         正式注入模式的选择，test模式开启时，无论正式注入模式是否开启都无效，默认开启
@@ -161,7 +161,7 @@ class BaseConfig:
         payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
 
         '''
-        self.payload = "padding' union select 1,'BSqlier' #"
+        self.payload = "padding' union all select 1,'BSqlier' #"
 
         '''
         配置请求,把请求中payload的位置设置为BSqlier（如果拼错了就会全部无效...）

