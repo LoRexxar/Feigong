@@ -44,7 +44,7 @@ class BaseConfig:
         self.version = "V0.8.0"
 
         # 目标url
-        self.url = 'http://demo.lorexxar.pw/get.php'
+        self.url = 'http://demo.lorexxar.pw/post.php'
         self.s = requests.Session()
 
         # 请求头参数
@@ -57,7 +57,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[0]
+        self.sqlirequest = SqliRequest[1]
 
         # 注入方式 0为正常 1为盲注 2为时间盲注
         SqliMethod = (
@@ -88,7 +88,7 @@ class BaseConfig:
 
         而testmethod则是选择使用那种测试，互相兼容可以同时跑
         '''
-        self.wtest = True
+        self.wtest = False
 
         self.testmethod = {
             "test": 0,
@@ -158,8 +158,8 @@ class BaseConfig:
         self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
         self.requesetformat = {"user": "BSqlier", "password": "a"}
         '''
-        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
-        # self.requesetformat = {"user": "BSqlier", "password": "a"}
+        # self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
+        self.requesetformat = {"user": "BSqlier", "password": "a"}
 
         '''
         配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload

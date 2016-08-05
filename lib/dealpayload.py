@@ -69,7 +69,7 @@ class DealPayload:
 
         # 转list为str
         payload = " ".join(payload)
-        return self.construct_request(payload)
+        return self.construct_request(payload.lower())
 
     def construct_build_payload(self, select=None, source=None, conditions=None, limit=0, compare=0):
 
@@ -92,7 +92,7 @@ class DealPayload:
         payload.append(repr(limit) + ',1')
 
         # 把payload外包裹括号进行比较
-        payload = self._add_parentheses(" ".join(payload))
+        payload = self.__add_parentheses(" ".join(payload))
 
         # 然后再分开继续处理
         payload = payload.split(" ")
@@ -100,17 +100,19 @@ class DealPayload:
         payload.append(">")
         payload.append(repr(compare))
 
-        payload = self._add_parentheses(" ".join(payload))
+        payload = self.__add_parentheses(" ".join(payload))
 
         # 然后再分开继续处理
         payload = payload.split(" ")
 
         # 在最前面添加select
         payload.insert(0, "select")
-        payload = self._add_parentheses(" ".join(payload))
+        payload = self.__add_parentheses(" ".join(payload))
 
-        return self.construct_request(self.payload.replace("2333", payload))
+        # 把生成的payload转为小写，并返回
+
+        return self.construct_request(self.payload.replace("2333", payload.lower()))
 
     @staticmethod
-    def _add_parentheses(payload):
+    def __add_parentheses(payload):
         return "(" + payload + ")"
