@@ -182,13 +182,9 @@ class BaseConfig:
         """
 
         self.filter = {
-            """
-            padding 为填充字段，build与注入要求padding必须为真值
-            """
+            # padding 为填充字段，build与注入要求padding必须为真值
             'padding': 'user1',
-            """
-            符号替换（url encode是get默认自带的，不需要修改）
-            """
+            # 符号替换（url encode是get默认自带的，不需要修改）
             '\'': '\'',
             '\"': '\"',
             '&': '&',
@@ -197,9 +193,7 @@ class BaseConfig:
             '<': '<',
             '=': '=',
             '.': '.',
-            """
-            注入语句关键字替换
-            """
+            # 注入语句关键字替换
             'union': 'union',
             'select': 'SELECT',
             'insert': 'insert',
@@ -207,9 +201,7 @@ class BaseConfig:
             'delete': 'delete',
             'limit': 'limit',
             'where': 'where',
-            """
-            注入函数
-            """
+            # 注入函数
             'user': 'user',
             'database': 'database',
             'version': 'version',
@@ -221,9 +213,7 @@ class BaseConfig:
             'substring': 'substring',  # mid()、substr()
             'length': 'length',
             "sleep(" + repr(self.time) + ")": "sleep(" + repr(self.time) + ")",  # benchmark()
-            """
-            库名表名关键字
-            """
+            # 库名表名关键字
             'information_schema': 'information_schema',
             'schemata': 'schemata',
             'schema_name': 'schema_name',
@@ -231,9 +221,7 @@ class BaseConfig:
             'table_name': 'table_name',
             'columns': 'columns',
             'column_name': 'column_name',
-            """
-            然后是特殊的字符
-            """
+            # 然后是特殊的字符
             ' ': ' ',   # 由于过滤后自动进行url encode，所以替换表不能使用url encode过的字符，eg:%0a->\n %0b->\x0b
             '#': '#'    # --+
         }
