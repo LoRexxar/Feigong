@@ -25,6 +25,7 @@ Feigong，In view of the different things freely change the mysql injection scri
 * 优化log存储方式
 * 优化build注入、time注入算法
 * 添加线程池优化注入速度
+* 完善对拓展函数的支持
 * 增加更多注入语句
 * 增加更多绕过过滤方式
 * 增加多种数据库
@@ -37,7 +38,7 @@ Feigong，In view of the different things freely change the mysql injection scri
 
 
 ## 使用文档 ##
-
+```
 Feigong
 │  .gitignore
 │  feigong.py
@@ -65,6 +66,6 @@ Feigong
         tables.py
         test.py
         __init__.py
-
+```
 
 Feigong一切一切的核心在于sqlier/config.py
