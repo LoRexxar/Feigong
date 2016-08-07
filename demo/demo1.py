@@ -75,7 +75,7 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[0]
+        self.sqlimethod = SqliMethod[1]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
@@ -175,6 +175,7 @@ class BaseConfig:
         self.requesetformat = {"user": "BSqlier", "password": "a"}
         """
         self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
+        # self.requesetformat = {"user": "BSqlier", "password": "a"}
 
         """
         配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload
