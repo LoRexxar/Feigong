@@ -2,23 +2,17 @@
 # -*- coding:utf-8 -*-
 
 from sqlier.expand import ExpandFunction
-from sqlier.data import DataProcess
-from sqlier.columns import SqliColumns
 from sqlier.content import SqliContent
-from sqlier.tables import SqliTables
-from sqlier.test import SqliTest
 from sqlier.data import logger
 from lib.log import log
-import logging
 
 __author__ = "LoRexxar"
 
 
 def main():
-    log(logging.DEBUG)
-    # log(logging.INFO)
-    logger.debug('start sqli...')
     s = SqliContent()
+    log(s.loglevel)
+    logger.info('start sqli...')
     if s.wtest:
         if s.testmethod['test']:
             s.test(output=1)

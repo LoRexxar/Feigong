@@ -39,6 +39,7 @@ class SqliContent(SqliColumns):
                 # 声明一个表储存数据
                 content = PrettyTable(list(self.columns_name[database_name][table_name]))
                 content.padding_width = 1
+                content.align = "r"
 
                 # 每个表都要注入指定条数那么多次
                 for limits in xrange(self.content_count):

