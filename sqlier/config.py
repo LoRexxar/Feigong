@@ -182,7 +182,7 @@ class BaseConfig:
 
         self.filter = {
             # padding 为填充字段，build与注入要求padding必须为真值
-            'padding': 'user1',
+            'padding': 'user',
             # 符号替换（url encode是get默认自带的，不需要修改）
             '\'': '\'',
             '\"': '\"',

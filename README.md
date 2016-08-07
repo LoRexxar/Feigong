@@ -69,3 +69,29 @@ Feigong
 ```
 
 Feigong一切一切的核心在于sqlier/config.py
+
+### 安装 ###
+
+你可以通过点击下载，或者git clone来获取源码
+```
+git clone https://github.com/LoRexxar/Feigong.git
+```
+
+### 使用 ###
+
+首先你需要安装依赖
+```
+pip install -r requirements.txt
+```
+
+lxml的安装比较特殊
+[https://pypi.python.org/pypi/lxml/3.4.2](https://pypi.python.org/pypi/lxml/3.4.2)
+
+```
+pip install lxml-3.4.2-cp27-none-win_amd64.whl
+```
+
+打开对应Feigong的目录，跑一下默认demo看看结果
+```
+python feigong.py
+```
