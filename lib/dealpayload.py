@@ -28,12 +28,12 @@ class DealPayload:
         # 如果是get请求,我们需要把payload url编码一下
         if self.sqlirequest == "GET":
             payload = quote(payload)
-            return self.requestformat.replace('BSqlier', payload)
+            return self.requestformat.replace('Feigong', payload)
         elif self.sqlirequest == "POST":
             # 这里是list，必须深拷贝
             request = copy.deepcopy(self.requestformat)
             for key in request:
-                if request[key] == 'BSqlier':
+                if request[key] == 'Feigong':
                     request[key] = payload
             return request
         else:
@@ -45,7 +45,7 @@ class DealPayload:
 
         # select为select的部分，替换自定义的BSqlier
         if select is not None:
-            payload = self.payload.replace('\'BSqlier\'', select)
+            payload = self.payload.replace('\'Feigong\'', select)
 
         # 我们需要把字符串按照空格划分，转为list
         payload = payload.split(" ")

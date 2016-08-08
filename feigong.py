@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-from sqlier.expand import ExpandFunction
 from sqlier.content import SqliContent
 from sqlier.data import logger
 from lib.log import log

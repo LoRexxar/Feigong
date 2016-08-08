@@ -1,9 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-import requests
 import time
 from urllib import quote
-from lib.log import logger
 from config import BaseConfig
 
 __author__ = "LoRexxar"

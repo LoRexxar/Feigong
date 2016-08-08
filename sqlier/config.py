@@ -92,6 +92,30 @@ class BaseConfig:
         self.time = 2
 
         """
+        从这里开始，要进入对于payload的配置了，首先需要对注入语句进行配置，然后注入语句通过自定义的替换表，之后构造注入语句为请求
+        payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
+
+        若为normal注入，必须构造返回BSqlier的payload，并通过test模式修改解包函数直至可以获取返回值（必须以空格为分隔符，结尾必须只有一个词（结尾可以通过修改自定义替换表中的值来修改））
+        eg: self.payload = "padding' union all select 1,'Feigong' #"
+
+        若为build注入，则为与、或条件构造，如果是与注入，padding必须为返回值的条件
+        eg: self.payload = "padding' && 2333 #"
+
+        若为time注入，则可以使用上面两种的任何一种，格式与其相符，同样，关键位置使用2333或者'Feigong'填充
+        eg: self.payload = "padding' union all select 1,'Feigong' #"
+        eg: self.payload = "padding' && 2333 #"
+
+        """
+        self.payload = "padding' && 2333 #"
+
+        """
+        配置请求,把请求中payload的位置设置为Feigong（如果拼错了就会全部无效...）
+        self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
+        self.requesetformat = {"user": "Feigong", "password": "a"}
+        """
+        self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
+
+        """
         在注入之前，你首先需要测试，test.py中包含所有的测试函数，包括test、get_now_database、get_version、get_user
 
         self.wtest是是否进入测试模式、测试模式优先级最高和普通模式不兼容，默认开启
@@ -151,30 +175,6 @@ class BaseConfig:
         当选择注入content时，你需要指定输入数据的上限，默认为10
         """
         self.content_count = 10
-
-        """
-        从这里开始，要进入对于payload的配置了，首先需要对注入语句进行配置，然后注入语句通过自定义的替换表，之后构造注入语句为请求
-        payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
-
-        若为normal注入，必须构造返回BSqlier的payload，并通过test模式修改解包函数直至可以获取返回值（必须以空格为分隔符，结尾必须只有一个词（结尾可以通过修改自定义替换表中的值来修改））
-        eg: self.payload = "padding' union all select 1,'Feigong' #"
-
-        若为build注入，则为与、或条件构造，如果是与注入，padding必须为返回值的条件
-        eg: self.payload = "padding' && 2333 #"
-
-        若为time注入，则可以使用上面两种的任何一种，格式与其相符，同样，关键位置使用2333或者'Feigong'填充
-        eg: self.payload = "padding' union all select 1,'Feigong' #"
-        eg: self.payload = "padding' && 2333 #"
-
-        """
-        self.payload = "padding' && 2333 #"
-
-        """
-        配置请求,把请求中payload的位置设置为BSqlier（如果拼错了就会全部无效...）
-        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
-        self.requesetformat = {"user": "BSqlier", "password": "a"}
-        """
-        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
 
         """
         配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload

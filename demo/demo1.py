@@ -170,12 +170,12 @@ class BaseConfig:
         self.payload = "padding' && 2333 #"
 
         """
-        配置请求,把请求中payload的位置设置为BSqlier（如果拼错了就会全部无效...）
+        配置请求,把请求中payload的位置设置为Feigong（如果拼错了就会全部无效...）
         self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
-        self.requesetformat = {"user": "BSqlier", "password": "a"}
+        self.requesetformat = {"user": "Feigong", "password": "a"}
         """
-        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
-        # self.requesetformat = {"user": "BSqlier", "password": "a"}
+        self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
+        # self.requesetformat = {"user": "Feigong", "password": "a"}
 
         """
         配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload
