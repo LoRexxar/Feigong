@@ -2,15 +2,26 @@
 # -*- coding:utf-8 -*-
 
 from sqlier.content import SqliContent
-from sqlier.data import logger
+from lib.log import logger
 from lib.log import log
+import re
 
 __author__ = "LoRexxar"
 
 
 def main():
     s = SqliContent()
-    log(s.loglevel)
+
+    # 处理下url，作为logname
+    name = re.findall("[\w\.-]+", s.url)
+    del name[0]
+    try:
+        url_name = "%2f".join(name)
+    except IndexError:
+        logger.error("url matching fail!")
+        exit(0)
+    log(s.loglevel, url_name)
+
     logger.info('start sqli...')
     if s.wtest:
         if s.testmethod['test']:

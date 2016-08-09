@@ -64,7 +64,6 @@ class SqliTest(BaseConfig):
                 # 如果self.len是未被定义过的，需要test跑一下
                 if self.len == 0:
                     self.test(output=0)
-
                 # 先注database长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")

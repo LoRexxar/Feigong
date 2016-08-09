@@ -60,7 +60,7 @@ class BaseConfig:
             logging.INFO,
             logging.WARN
         )
-        self.loglevel = LogLevel[1]
+        self.loglevel = LogLevel[0]
 
         # 传参方式 0为GET 1为POST
         SqliRequest = (
@@ -75,7 +75,7 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[0]
+        self.sqlimethod = SqliMethod[1]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
@@ -182,7 +182,7 @@ class BaseConfig:
 
         self.filter = {
             # padding 为填充字段，build与注入要求padding必须为真值
-            'padding': 'user',
+            'padding': 'user1',
             # 符号替换（url encode是get默认自带的，不需要修改）
             '\'': '\'',
             '\"': '\"',
