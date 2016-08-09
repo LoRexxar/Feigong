@@ -43,7 +43,7 @@ class BaseConfig:
         """
         基类初始化，整个注入工具的核心配置
         """
-        self.version = "V0.9.9"
+        self.version = "V1.0.0"
 
         # 目标url
         self.url = 'http://demo.lorexxar.pw/get.php'
