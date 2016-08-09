@@ -6,11 +6,12 @@ import colorlog
 
 __author__ = "LoRexxar"
 
-logger = logging.getLogger('BSqlier')
+logger = logging.getLogger('Feigong')
 
 
 # log
 def log(loglevel, log_name):
+    global logger
     handler = colorlog.StreamHandler()
     handler.setFormatter(
         colorlog.ColoredFormatter(
@@ -27,9 +28,9 @@ def log(loglevel, log_name):
     )
     f = open("log/" + log_name, 'a+')
     handler2 = logging.StreamHandler(f)
-    formatter = logging.Formatter("[%(levelname)s] [%(threadName)s] [%(asctime)s] [%(filename)s:%(lineno)d] %(message)s")
+    formatter = logging.Formatter(
+        "[%(levelname)s] [%(threadName)s] [%(asctime)s] [%(filename)s:%(lineno)d] %(message)s")
     handler2.setFormatter(formatter)
     logger.addHandler(handler2)
     logger.addHandler(handler)
     logger.setLevel(loglevel)
-

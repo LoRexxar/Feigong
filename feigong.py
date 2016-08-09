@@ -11,7 +11,6 @@ __author__ = "LoRexxar"
 
 def main():
     s = SqliContent()
-
     # 处理下url，作为logname
     name = re.findall("[\w\.-]+", s.url)
     del name[0]
