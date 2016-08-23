@@ -1,10 +1,11 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-from sqlier.content import SqliContent
-from lib.log import logger
-from lib.log import log
 import re
+
+from lib.log import log
+from lib.log import logger
+from sqlier.techniques.content import SqliContent
 
 __author__ = "LoRexxar"
 
@@ -47,9 +48,6 @@ def main():
         logger.error("Did not select any mode")
         exit(0)
 
-    # SqliTables.get_tables()
-    # SqliColumns.get_columns()
-    # SqliContent.get_flag()
     # print ExpandFunction.crack_code('593e')
 
 

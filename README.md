@@ -26,7 +26,7 @@ Feigong，In view of the different things freely change the mysql injection scri
 
 * <del>完成基本功能</del>
 * <del>优化log存储方式</del>
-* 优化build注入、time注入算法
+* <del>优化build注入、time注入算法</del>
 * 添加线程池优化注入速度
 * 完善对拓展函数的支持
 * 增加更多注入语句
@@ -43,6 +43,10 @@ Feigong，In view of the different things freely change the mysql injection scri
 	* 增加 log对文件的输出
 	* 优化 部分错误处理
 	* 增加 较为完整的文档
+* 2016-8-24
+    * Feigong 1.0.1完成
+    * 优化 盲注算法
+    * 优化 整体结构
 
 ## 使用文档 ##
 ```

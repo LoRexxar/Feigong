@@ -3,7 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 from lib.log import logger
-from lib.dealpayload import DealPayload
+from lib.Conpayload import ConPayload
 import logging
 
 __author__ = "LoRexxar"
@@ -43,10 +43,10 @@ class BaseConfig:
         """
         基类初始化，整个注入工具的核心配置
         """
-        self.version = "V1.0.0"
+        self.version = "V1.0.1"
 
         # 目标url
-        self.url = 'http://demo.lorexxar.pw/get.php'
+        self.url = 'http://demo.lorexxar.pw/post.php'
         self.s = requests.Session()
 
         # 请求头参数
@@ -55,7 +55,7 @@ class BaseConfig:
         self.headers = {}
 
         # log日志级别，debug为显示大部分信息，info为注入结果的显示
-        LogLevel=(
+        LogLevel = (
             logging.DEBUG,
             logging.INFO,
             logging.WARN
@@ -67,7 +67,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[0]
+        self.sqlirequest = SqliRequest[1]
 
         # 注入方式 0为正常 1为盲注 2为时间盲注
         SqliMethod = (
@@ -113,7 +113,8 @@ class BaseConfig:
         self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
         self.requesetformat = {"user": "Feigong", "password": "a"}
         """
-        self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
+        # self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
+        self.requesetformat = {"user": "Feigong", "password": "a"}
 
         """
         在注入之前，你首先需要测试，test.py中包含所有的测试函数，包括test、get_now_database、get_version、get_user
@@ -122,7 +123,7 @@ class BaseConfig:
 
         而testmethod则是选择使用那种测试，互相兼容可以同时跑
         """
-        self.wtest = True
+        self.wtest = False
 
         self.testmethod = {
             "test": 0,
@@ -228,4 +229,4 @@ class BaseConfig:
         """
         初始化dealpayload类，传入self.sqlimethod，self.payload, self.requestformat, self.filter
         """
-        self.dealpayload = DealPayload(self.sqlirequest, self.payload, self.requesetformat, self.filter, self.time)
+        self.dealpayload = ConPayload(self.sqlirequest, self.payload, self.requesetformat, self.filter, self.time)

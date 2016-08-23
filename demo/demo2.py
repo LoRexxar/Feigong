@@ -3,7 +3,7 @@
 import requests
 from bs4 import BeautifulSoup
 from lib.log import logger
-from lib.dealpayload import DealPayload
+from lib.Conpayload import DealPayload
 import logging
 
 __author__ = "LoRexxar"

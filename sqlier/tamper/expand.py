@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 import hashlib
-from lib.log import logger
-from data import DataProcess
-from config import BaseConfig
+
+from sqlier.config import BaseConfig
+from lib.data import DataProcess
 
 __author__ = "LoRexxar"
 

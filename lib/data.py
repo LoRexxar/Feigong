@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 import time
 from urllib import quote
-from config import BaseConfig
+from sqlier.config import BaseConfig
 from lib.log import logger
 
 __author__ = "LoRexxar"
@@ -43,9 +43,9 @@ class DataProcess(BaseConfig):
         # print r.text.encode('utf-8')
         # print payload
         if lens == llen:
-            return 1
+            return True
         else:
-            return 0
+            return False
 
     def GetTimeData(self, payload, dtime):
         data = payload
@@ -58,9 +58,9 @@ class DataProcess(BaseConfig):
         rr = r.text.encode('utf-8')
         ntime = time.time()
         if ntime-ptime > dtime:
-            return 1
+            return True
         else:
-            return 0
+            return False
 
     def PostLen(self, payload):
         data = payload
@@ -86,9 +86,9 @@ class DataProcess(BaseConfig):
         lens = len(r.text.encode('utf-8'))
         # print r.text.encode('utf-8')
         if lens == llen:
-            return 1
+            return True
         else:
-            return 0
+            return False
 
     def PostTimeData(self, payload, dtime):
         data = payload
@@ -101,7 +101,7 @@ class DataProcess(BaseConfig):
         rr = r.text.encode('utf-8')
         ntime = time.time()
         if ntime - ptime > dtime:
-            return 1
+            return True
         else:
-            return 0
+            return False
 
