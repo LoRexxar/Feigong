@@ -27,6 +27,7 @@ Feigong，In view of the different things freely change the mysql injection scri
 * <del>完成基本功能</del>
 * <del>优化log存储方式</del>
 * <del>优化build注入、time注入算法</del>
+* 优化解包函数，避免自定义解包
 * 添加线程池优化注入速度
 * 完善对拓展函数的支持
 * 增加更多注入语句
