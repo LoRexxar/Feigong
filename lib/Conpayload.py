@@ -40,12 +40,12 @@ class ConPayload:
             logger.error("self.Sqlimethod can not be identified")
             exit(0)
 
-    def construct_normal_payload(self, select=None, source=None, conditions=None, limit=0):
+    def construct_normal_payload(self, select=None, source=None, conditions=None, limit=0, padding=None):
         payload = self.payload
 
         # select为select的部分，替换自定义的BSqlier
         if select is not None:
-            payload = self.payload.replace('\'Feigong\'', select)
+            payload = self.payload.replace('\'Feigong\'', self.__add_concat(select, padding))
 
         # 我们需要把字符串按照空格划分，转为list
         payload = payload.split(" ")
@@ -166,3 +166,7 @@ class ConPayload:
     @staticmethod
     def __add_parentheses(payload):
         return "(" + payload + ")"
+
+    @staticmethod
+    def __add_concat(payload, padding):
+        return "concat(0x" + padding.encode('hex') + "," + payload + ",0x" + padding.encode('hex') + ")"

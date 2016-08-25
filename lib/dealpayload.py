@@ -1,14 +1,37 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
 
-from tqdm import trange
-from lib.data import DataProcess
 from lib.log import logger
+from lib.unpack import UnpackFunction
+from lib.unpack import random_string
 from sqlier.configuration.buildconfig import CharInjectionList
 from sqlier.configuration.buildconfig import NumberInjectionList
 from sqlier.configuration.buildconfig import CountInjectionList
 
 __author__ = "LoRexxar"
+
+
+def normal_injection(select=None, source=None, conditions=None, limit=0, dealpayload=None, data=None, isStrings=False, isCount=False, sqlirequest=None):
+
+    # 生成随机字符串padding
+    padding = random_string()
+
+    payload = dealpayload.construct_normal_payload(select=select, source=source, conditions=conditions, limit=limit, padding=padding)
+
+    if sqlirequest == "GET":
+        result = data.GetData(payload)
+    elif sqlirequest == "POST":
+        result = data.PostData(payload)
+    else:
+        logger.error("sqlirequest error...")
+        exit(0)
+
+    if isCount:
+        return int(UnpackFunction(result, padding))
+    elif isStrings:
+        return UnpackFunction(result, padding)
+    else:
+        logger.error("Something error...")
 
 
 def build_injection(select=None, source=None, conditions=None, limit=0, dealpayload=None, data=None, lens=0, isNumber=False, isStrings=False, isCount=False, sqlirequest=None):

