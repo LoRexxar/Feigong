@@ -11,7 +11,6 @@ logger = logging.getLogger('Feigong')
 
 # log
 def log(loglevel, log_name):
-    global logger
     handler = colorlog.StreamHandler()
     handler.setFormatter(
         colorlog.ColoredFormatter(
