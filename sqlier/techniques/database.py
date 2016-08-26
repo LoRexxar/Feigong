@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from sqlier.config import UnpackFunction
+
 from lib.log import logger
 from test import SqliTest
 from tqdm import trange

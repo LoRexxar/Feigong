@@ -2,7 +2,7 @@
 # -*- coding:utf-8 -*-
 from tqdm import trange
 
-from sqlier.config import BaseConfig
+from sqlier.advanced_config import AdvanceConfig
 from lib.data import DataProcess
 from lib.log import logger
 from lib.dealpayload import build_injection
@@ -12,9 +12,9 @@ from lib.dealpayload import normal_injection
 __author__ = "LoRexxar"
 
 
-class SqliTest(BaseConfig):
+class SqliTest(AdvanceConfig):
     def __init__(self):
-        BaseConfig.__init__(self)
+        AdvanceConfig.__init__(self)
         self.Data = DataProcess()
 
     def test(self, output=1):

@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 # -*- coding:utf-8 -*-
-from sqlier.config import UnpackFunction
 from lib.dealpayload import build_injection
 from lib.dealpayload import time_injection
 from lib.dealpayload import normal_injection
