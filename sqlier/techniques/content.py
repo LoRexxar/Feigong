@@ -62,9 +62,8 @@ class SqliContent(SqliColumns):
                             t = threading.Thread(target=self.get_content, name='thread for %s' % column_name,
                                                  args=(result, database_name, table_name, column_name, limits))
                             t.start()
-                        except ConnectionError:
+                        except:
                             logger.error('Thread error...')
-                            pass
 
                         threads.append(t)
 
