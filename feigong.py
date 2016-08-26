@@ -11,6 +11,7 @@ __author__ = "LoRexxar"
 
 
 def main():
+
     s = SqliContent()
 
     # 处理下url，作为logname
@@ -19,11 +20,15 @@ def main():
     try:
         url_name = "%2f".join(name)
     except IndexError:
-        logger.error("url matching fail!")
+        print "url matching fail!"
         exit(0)
     log(s.loglevel, url_name)
 
     logger.info('start sqli...')
+
+    if s.len == 0:
+        s.test( output=0)
+
     if s.wtest:
         if s.testmethod['test']:
             s.test(output=1)

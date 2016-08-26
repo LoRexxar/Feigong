@@ -2,16 +2,16 @@
 # -*- coding:utf-8 -*-
 import time
 from urllib import quote
-from sqlier.config import BaseConfig
+from sqlier.advanced_config import AdvanceConfig
 from lib.log import logger
 
 __author__ = "LoRexxar"
 
 
-class DataProcess(BaseConfig):
+class DataProcess(AdvanceConfig):
     # 获取返回数据
     def __init__(self):
-        BaseConfig.__init__(self)
+        AdvanceConfig.__init__(self)
 
     def GetLen(self, payload):
         data = quote(payload)

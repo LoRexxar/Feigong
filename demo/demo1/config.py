@@ -10,7 +10,7 @@ class BaseConfig:
         基类初始化，整个注入工具的核心配置
         """
         # 目标url
-        self.url = 'http://demo.lorexxar.pw/get.php'
+        self.url = 'http://demo.lorexxar.pw/post.php'
 
         # 请求头参数
         # cookies = {"username":data,"path":"/admin/","domain":"451bf8ea3268360ee.jie.sangebaimao.com"}
@@ -22,7 +22,7 @@ class BaseConfig:
             "GET",
             "POST"
         )
-        self.sqlirequest = SqliRequest[0]
+        self.sqlirequest = SqliRequest[1]
 
         # 注入方式 0为正常 1为盲注 2为时间盲注
         SqliMethod = (
@@ -53,8 +53,8 @@ class BaseConfig:
         self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
         self.requesetformat = {"user": "Feigong", "password": "a"}
         """
-        self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
-        # self.requesetformat = {"user": "Feigong", "password": "a"}
+        # self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
+        self.requesetformat = {"user": "Feigong", "password": "a"}
 
         """
         在注入之前，你首先需要测试，test.py中包含所有的测试函数，包括test、get_now_database、get_version、get_user

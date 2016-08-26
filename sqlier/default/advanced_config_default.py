@@ -15,6 +15,7 @@ class AdvanceConfig(BaseConfig):
         进阶配置，如果对代码不够熟悉，建议不修改这部分配置
         """
         BaseConfig.__init__(self)
+
         # 版本号
         self.version = "V1.2.0"
 
@@ -30,9 +31,9 @@ class AdvanceConfig(BaseConfig):
         self.loglevel = LogLevel[0]
 
         """
-        若注入方式为build盲注，则通过返回长度判断
-        永真条件的长度（盲注时需要使用），默认为0，可设置, 如果不设置会默认使用self.payload获取的返回长度为self.len
-        """
+            若注入方式为build盲注，则通过返回长度判断
+            永真条件的长度（盲注时需要使用），默认为0，可设置, 如果不设置会默认使用self.payload获取的返回长度为self.len
+            """
         self.len = 0
 
         """
@@ -67,55 +68,6 @@ class AdvanceConfig(BaseConfig):
         当选择注入content时，你需要指定输入数据的上限，默认为10
         """
         self.content_count = 10
-
-        """
-        配置自定义替换表,合理的替换表配置远远可以替换出想要的所有情况payload
-        """
-
-        self.filter = {
-            # padding 为填充字段，build与注入要求padding必须为真值
-            'padding': 'user1',
-            # 符号替换（url encode是get默认自带的，不需要修改）
-            '\'': '\'',
-            '\"': '\"',
-            '&': '&',
-            '|': '|',
-            '>': '>',
-            '<': '<',
-            '=': '=',
-            '.': '.',
-            # 注入语句关键字替换
-            'union': 'union',
-            'select': 'SELECT',
-            'insert': 'insert',
-            'update': 'update',
-            'delete': 'delete',
-            'limit': 'limit',
-            'where': 'where',
-            # 注入函数
-            'user': 'user',
-            'database': 'database',
-            'version': 'version',
-            'if': 'if',
-            'ifnull': 'ifnull',
-            'concat': 'concat',
-            'ascii': 'ascii',  # hex()、bin()
-            'count': 'count',
-            'substring': 'substring',  # mid()、substr()
-            'length': 'length',
-            "sleep(" + repr(self.time) + ")": "sleep(" + repr(self.time) + ")",  # benchmark()
-            # 库名表名关键字
-            'information_schema': 'information_schema',
-            'schemata': 'schemata',
-            'schema_name': 'schema_name',
-            'tables': 'tables',
-            'table_name': 'table_name',
-            'columns': 'columns',
-            'column_name': 'column_name',
-            # 然后是特殊的字符
-            ' ': ' ',  # 由于过滤后自动进行url encode，所以替换表不能使用url encode过的字符，eg:%0a->\n %0b->\x0b
-            '#': '#'  # --+
-        }
 
         """
         初始化dealpayload类，传入self.sqlimethod，self.payload, self.requestformat, self.filter

@@ -17,8 +17,6 @@ __author__ = "LoRexxar"
 class SqliDatabases(SqliTest):
     def __init__(self):
         SqliTest.__init__(self)
-        if self.len == 0:
-            SqliTest.test(self, output=0)
 
     def get_database(self):
 

@@ -54,6 +54,10 @@ Feigong，In view of the different things freely change the mysql injection scri
 * 2016-8-26
     * Feigong 1.1.1完成
     * 优化 整体结构，避免了自定义解包函数
+* 2016-8-27
+    * Feigong 1.2.0完成
+    * 重构 config->config、advanced_config
+    * 优化 整体结构，大幅度减少冗余代码
 
 ## 使用文档 ##
 ```
