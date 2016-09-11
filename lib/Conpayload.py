@@ -4,6 +4,7 @@
 from urllib import quote
 from lib.log import logger
 import copy
+import base64
 
 __author__ = "LoRexxar"
 

