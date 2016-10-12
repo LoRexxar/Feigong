@@ -35,7 +35,7 @@ class ConPayload:
             request = copy.deepcopy(self.requestformat)
             for key in request:
                  if request[key] == 'Feigong':
-                    request[key] = base64.b64encode(base64.b64encode(payload))
+                    request[key] = payload
             return request
         else:
             logger.error("self.Sqlimethod can not be identified")

@@ -75,7 +75,7 @@ class AdvanceConfig(BaseConfig):
 
         self.filter = {
             # padding 为填充字段，build与注入要求padding必须为真值
-            'padding': '123',
+            'padding': 'user1',
             # 符号替换（url encode是get默认自带的，不需要修改）
             '\'': '\'',
             '\"': '\"',
