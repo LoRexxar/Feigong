@@ -3,8 +3,8 @@
  [![Feigong Release](https://landscape.io/github/LoRexxar/Feigong/master/landscape.svg?style=flat)]()
  [![Feigong Open Issue](https://img.shields.io/github/issues-raw/LoRexxar/Feigong.svg)]()
  [![Feigong Close Issue](https://img.shields.io/github/issues-closed-raw/LoRexxar/Feigong.svg)]()
- [![GitHub watchers](https://img.shields.io/github/stars/LoRexxar/Feigong.svg?style=social&label=Watch)]()
- [![GitHub forks](https://img.shields.io/github/stars/LoRexxar/Feigong.svg?style=social&label=Fork)]()
+ [![GitHub watchers](https://img.shields.io/github/watchers/LoRexxar/Feigong.svg?style=social&label=Watch)]()
+ [![GitHub forks](https://img.shields.io/github/forks/LoRexxar/Feigong.svg?style=social&label=Fork)]()
  [![GitHub stars](https://img.shields.io/github/stars/LoRexxar/Feigong.svg?style=social&label=Star)]()
  [![GitHub followers](https://img.shields.io/github/followers/LoRexxar.svg?style=social&label=Follow)](https://github.com/LoRexxar/)
 
