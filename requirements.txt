@@ -1,8 +1,0 @@
-beautifulsoup4==4.5.1
-bs4==0.0.1
-colorama==0.3.7
-colorlog==2.7.0
-humanfriendly==1.44.7
-prettytable==0.7.2
-requests==2.10.0
-tqdm==4.8.3
